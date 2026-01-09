@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DoubleScreener - Dual Screen Projection Tool</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Slab:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <i class="fas fa-desktop logo-icon"></i>
+                <h1>Double<span>Screener</span></h1>
+            </div>
+            <p class="tagline">Dual Screen Projection Made Simple</p>
+        </header>
+
+        <main>
+            <section class="hero">
+                <div class="hero-content">
+                    <h2>What is DoubleScreener?</h2>
+                    <p class="description">
+                        DoubleScreener is a web application designed to help users project texts and images on a second screen through two interconnected pages: 
+                        a <strong>backend page with GUI controls</strong> and a <strong>frontend page</strong> displayed on the secondary screen.
+                    </p>
+                    
+                    <div class="features">
+                        <div class="feature">
+                            <i class="fas fa-sliders-h"></i>
+                            <h3>Backend Controls</h3>
+                            <p>Full control over content with an intuitive interface</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-tv"></i>
+                            <h3>Frontend Display</h3>
+                            <p>Clean presentation optimized for secondary screens</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-sync-alt"></i>
+                            <h3>Real-time Sync</h3>
+                            <p>Changes appear instantly on the frontend</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="cta-section">
+                    <h3>Get Started</h3>
+                    <p>Open both pages to start using DoubleScreener</p>
+                    
+                    <div class="buttons">
+                        <button class="btn backend-btn" onclick="location.href='DoubleScreener/backend.html'">
+                            <i class="fas fa-cogs"></i>
+                            Backend (Control)
+                        </button>
+                        
+                        <button class="btn frontend-btn" onclick="openFrontend()">
+                            <i class="fas fa-desktop"></i>
+                            Frontend (Display)
+                        </button>
+                        
+                        <button class="btn both-btn" onclick="openBoth()">
+                            <i class="fas fa-play-circle"></i>
+                            Launch Both
+                        </button>
+                    </div>
+                    
+                    <div class="instructions">
+                        <h4><i class="fas fa-info-circle"></i> How to Use:</h4>
+                        <ol>
+                            <li>Open the <strong>Backend</strong> page for controls</li>
+                            <li>Open the <strong>Frontend</strong> page on your second screen</li>
+                            <li>Use the backend controls to update content</li>
+                            <li>Watch changes appear instantly on the frontend</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="demo-preview">
+                <h2>Preview</h2>
+                <div class="preview-container">
+                    <div class="preview-window backend-preview">
+                        <div class="preview-header">Backend Controls</div>
+                        <div class="preview-content">
+                            <div class="preview-controls">
+                                <div class="preview-slider"></div>
+                                <div class="preview-buttons">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                                <div class="preview-textarea"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-connector">
+                        <i class="fas fa-arrow-right"></i>
+                        <i class="fas fa-sync-alt"></i>
+                        <i class="fas fa-arrow-left"></i>
+                    </div>
+                    
+                    <div class="preview-window frontend-preview">
+                        <div class="preview-header">Frontend Display</div>
+                        <div class="preview-content">
+                            <div class="preview-slide">
+                                <h3>Sample Presentation</h3>
+                                <p>Content appears here...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>DoubleScreener | Open Source project</p>
+            <div class="footer-links">
+                <a href="https://github.com/il-mangia"><i class="fas fa-code"></i> GitHub</a>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Set current year in footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        
+        function openFrontend() {
+            window.open(
+                'DoubleScreener/frontend.html',
+                'DoubleScreenerPopup',
+                'width=900,height=600,resizable=yes,scrollbars=yes,top=100,left=100'
+            );
+        }
+        
+        function openBoth() {
+            // Open backend in current window
+            window.location.href = 'DoubleScreener/backend.html';
+            
+            // Open frontend in popup after a short delay
+            setTimeout(function() {
+                openFrontend();
+            }, 500);
+        }
+        
+        // Add some interactive effects to buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+                
+                button.addEventListener('mousedown', function() {
+                    this.style.transform = 'translateY(1px)';
+                });
+                
+                button.addEventListener('mouseup', function() {
+                    this.style.transform = 'translateY(-3px)';
+                });
+            });
+            
+            // Add animated elements to preview
+            const previewSlide = document.querySelector('.preview-slide');
+            if (previewSlide) {
+                const texts = [
+                    {title: "Welcome", content: "DoubleScreener makes presentations easy"},
+                    {title: "Real-time Updates", content: "Changes appear instantly"},
+                    {title: "Dual Screen", content: "Perfect for presentations"}
+                ];
+                
+                let currentIndex = 0;
+                setInterval(() => {
+                    currentIndex = (currentIndex + 1) % texts.length;
+                    previewSlide.querySelector('h3').textContent = texts[currentIndex].title;
+                    previewSlide.querySelector('p').textContent = texts[currentIndex].content;
+                    
+                    // Add animation
+                    previewSlide.style.opacity = '0.7';
+                    setTimeout(() => {
+                        previewSlide.style.opacity = '1';
+                    }, 200);
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
