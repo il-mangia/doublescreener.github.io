@@ -3,7 +3,7 @@
 </p>
 
 **DoubleScreener** is a **HTML visual editor** designed to create web pages with a **live second-screen**.  
-It’s **fully local** (or **online**), **open-source**, and **framework-free**, perfect for learning HTML/CSS, prototyping, or making interactive presentations.
+For more info or for the program documentation, see the [Wiki Page](https://github.com/il-mangia/doublescreener.github.io/wiki).
 
 ## Usage
 You can use DoubleScreener [**online**](https://il-mangia.github.io/doublescreener.github.io/) <br>
