@@ -2,7 +2,7 @@
   <img src="logo.png" alt="DoubleScreener Logo" height="150">
 </p>
 
-**DoubleScreener** is a **HTML visual editor for chrome-based browsers** designed to create web pages with a **live second-screen**.  
+**DoubleScreener** is a **HTML visual editor** designed to create web pages with a **live second-screen**.  
 For more info or for the program documentation, see the [Wiki Page](https://github.com/il-mangia/doublescreener.github.io/wiki).
 
 ## Usage
