@@ -125,71 +125,63 @@
     </div>
 
     <script>
-        // Set current year in footer
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
-        
-        function openFrontend() {
-            window.open(
-                'app/frontend.html',
-                'DoubleScreenerPopup',
-                'width=900,height=600,resizable=yes,scrollbars=yes,top=100,left=100'
-            );
-        }
-        
-        function openBoth() {
-            // Open backend in current window
+    function openFrontend() {
+        window.open(
+            'app/frontend.html',
+            'DoubleScreenerPopup',
+            'width=900,height=600,resizable=yes,scrollbars=yes,top=100,left=100'
+        );
+    }
+
+    function openBoth() {
+        // apri frontend subito
+        openFrontend();
+
+        // poi vai al backend
+        setTimeout(() => {
             window.location.href = 'app/backend.html';
-            
-            // Open frontend in popup after a short delay
-            setTimeout(function() {
-                openFrontend();
-            }, 500);
-        }
-        
-        // Add some interactive effects to buttons
-        document.addEventListener('DOMContentLoaded', function() {
-            const buttons = document.querySelectorAll('.btn');
-            buttons.forEach(button => {
-                button.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-3px)';
-                });
-                
-                button.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                });
-                
-                button.addEventListener('mousedown', function() {
-                    this.style.transform = 'translateY(1px)';
-                });
-                
-                button.addEventListener('mouseup', function() {
-                    this.style.transform = 'translateY(-3px)';
-                });
+        }, 300);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const buttons = document.querySelectorAll('.btn');
+        buttons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-3px)';
             });
-            
-            // Add animated elements to preview
-            const previewSlide = document.querySelector('.preview-slide');
-            if (previewSlide) {
-                const texts = [
-                    {title: "Welcome", content: "DoubleScreener makes presentations easy"},
-                    {title: "Real-time Updates", content: "Changes appear instantly"},
-                    {title: "Dual Screen", content: "Perfect for presentations"}
-                ];
-                
-                let currentIndex = 0;
-                setInterval(() => {
-                    currentIndex = (currentIndex + 1) % texts.length;
-                    previewSlide.querySelector('h3').textContent = texts[currentIndex].title;
-                    previewSlide.querySelector('p').textContent = texts[currentIndex].content;
-                    
-                    // Add animation
-                    previewSlide.style.opacity = '0.7';
-                    setTimeout(() => {
-                        previewSlide.style.opacity = '1';
-                    }, 200);
-                }, 3000);
-            }
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+            button.addEventListener('mousedown', function() {
+                this.style.transform = 'translateY(1px)';
+            });
+            button.addEventListener('mouseup', function() {
+                this.style.transform = 'translateY(-3px)';
+            });
         });
-    </script>
+
+        const previewSlide = document.querySelector('.preview-slide');
+        if (previewSlide) {
+            const texts = [
+                {title: "Welcome", content: "DoubleScreener makes presentations easy"},
+                {title: "Real-time Updates", content: "Changes appear instantly"},
+                {title: "Dual Screen", content: "Perfect for presentations"}
+            ];
+
+            let currentIndex = 0;
+            setInterval(() => {
+                currentIndex = (currentIndex + 1) % texts.length;
+                previewSlide.querySelector('h3').textContent = texts[currentIndex].title;
+                previewSlide.querySelector('p').textContent = texts[currentIndex].content;
+
+                previewSlide.style.opacity = '0.7';
+                setTimeout(() => {
+                    previewSlide.style.opacity = '1';
+                }, 200);
+            }, 3000);
+        }
+    });
+</script>
+
 </body>
 </html>
