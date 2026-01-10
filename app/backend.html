@@ -12,9 +12,9 @@
         <!-- Top Toolbar -->
         <header class="header">
             <div class="logo-section">
-                <i class="fas fa-cube"></i>
-                <h1>Visual Builder</h1>
-                <span class="version">PRO</span>
+                <i class="fas fa-display"></i>
+                <h1>DoubleScreener Backend Controls</h1>
+                <span class="version">V1</span>
             </div>
             
             <div class="toolbar-actions">
@@ -298,17 +298,51 @@
                                 </div>
                             </div>
                             
+                            <!-- FONT SIZE PERSONALIZZABILE fino a 500px -->
                             <div class="property-item">
-                                <label>Font Size</label>
-                                <select id="propFontSize">
-                                    <option value="12">12px - Small</option>
-                                    <option value="14">14px - Normal</option>
-                                    <option value="16" selected>16px - Base</option>
-                                    <option value="18">18px - Large</option>
-                                    <option value="24">24px - Heading</option>
-                                    <option value="32">32px - Title</option>
-                                    <option value="48">48px - Display</option>
+                                <label>Font Size <span id="currentFontSize">16px</span></label>
+                                <div class="font-size-control">
+                                    <button class="font-size-btn" data-action="decrease">-</button>
+                                    <input type="range" id="propFontSize" min="8" max="500" value="16" step="1" class="font-size-slider">
+                                    <button class="font-size-btn" data-action="increase">+</button>
+                                    <div class="font-size-input-group">
+                                        <input type="number" id="propFontSizeInput" min="8" max="500" value="16" class="font-size-input">
+                                        <span class="font-size-unit">px</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="property-item">
+                                <label>Font Weight</label>
+                                <select id="propFontWeight">
+                                    <option value="100">Thin (100)</option>
+                                    <option value="200">Extra Light (200)</option>
+                                    <option value="300">Light (300)</option>
+                                    <option value="400" selected>Normal (400)</option>
+                                    <option value="500">Medium (500)</option>
+                                    <option value="600">Semi-bold (600)</option>
+                                    <option value="700">Bold (700)</option>
+                                    <option value="800">Extra bold (800)</option>
+                                    <option value="900">Black (900)</option>
                                 </select>
+                            </div>
+                            
+                            <div class="property-item">
+                                <label>Text Align</label>
+                                <div class="text-align-buttons">
+                                    <button class="text-align-btn" data-align="left" title="Left">
+                                        <i class="fas fa-align-left"></i>
+                                    </button>
+                                    <button class="text-align-btn" data-align="center" title="Center">
+                                        <i class="fas fa-align-center"></i>
+                                    </button>
+                                    <button class="text-align-btn" data-align="right" title="Right">
+                                        <i class="fas fa-align-right"></i>
+                                    </button>
+                                    <button class="text-align-btn" data-align="justify" title="Justify">
+                                        <i class="fas fa-align-justify"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         
@@ -402,8 +436,15 @@
                             </div>
                             <div class="property-item">
                                 <label>Base Font Size</label>
-                                <input type="range" id="pageBaseFontSize" min="12" max="20" value="16">
-                                <span class="range-value" id="pageBaseFontSizeValue">16px</span>
+                                <div class="font-size-control">
+                                    <button class="font-size-btn" data-action="decrease-page">-</button>
+                                    <input type="range" id="pageBaseFontSize" min="8" max="72" value="16" step="1" class="font-size-slider">
+                                    <button class="font-size-btn" data-action="increase-page">+</button>
+                                    <div class="font-size-input-group">
+                                        <input type="number" id="pageBaseFontSizeInput" min="8" max="72" value="16" class="font-size-input">
+                                        <span class="font-size-unit">px</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -440,7 +481,7 @@
             </aside>
         </div>
 
-        <!-- Status Bar -->
+        <!-- Status Bar con Debug Button -->
         <footer class="status-bar">
             <div class="status-left">
                 <span class="status-item">
@@ -464,6 +505,11 @@
                     <i class="fas fa-database"></i>
                     <span id="storageStatus">Auto-saved</span>
                 </span>
+                <!-- BOTTONE DEBUG -->
+                <button class="status-btn" id="debugBtn" title="Open Debug Sniffer (Ctrl+D)">
+                    <i class="fas fa-bug"></i>
+                </button>
+                <!-- BOTTONE FRONTEND -->
                 <button class="status-btn" id="openFrontendBtn" title="Open Frontend">
                     <i class="fas fa-external-link-alt"></i>
                 </button>
@@ -514,6 +560,7 @@
                 this.loadFromStorage();
                 this.setupEventListeners();
                 this.setupDragAndDrop();
+                this.setupFontSizeControls();
                 this.updateUI();
                 this.setupCanvas();
                 this.showStatus('Ready to build');
@@ -549,6 +596,7 @@
                 document.getElementById('copyCodeBtn').addEventListener('click', () => this.copyCode());
                 document.getElementById('copyCssBtn').addEventListener('click', () => this.copyCss());
                 document.getElementById('openFrontendBtn').addEventListener('click', () => this.openFrontend());
+                document.getElementById('debugBtn').addEventListener('click', () => this.openDebug());
                 
                 // Page properties
                 document.getElementById('pageTitle').addEventListener('input', (e) => {
@@ -565,10 +613,12 @@
                     document.getElementById('propRadiusValue').textContent = `${e.target.value}px`;
                 });
                 
-                document.getElementById('pageBaseFontSize').addEventListener('input', (e) => {
-                    document.getElementById('pageBaseFontSizeValue').textContent = `${e.target.value}px`;
-                    this.pageSettings.baseFontSize = parseInt(e.target.value);
-                    this.saveToStorage();
+                // Text align buttons
+                document.querySelectorAll('.text-align-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const align = e.target.closest('.text-align-btn').dataset.align;
+                        this.setElementTextAlign(align);
+                    });
                 });
                 
                 // Keyboard shortcuts
@@ -588,7 +638,17 @@
                         } else if (e.key === 's') {
                             e.preventDefault();
                             this.savePage();
+                        } else if (e.key === 'd') {
+                            e.preventDefault();
+                            this.openDebug();
+                        } else if (e.key === 'p') {
+                            e.preventDefault();
+                            this.previewPage();
                         }
+                    }
+                    // Escape to deselect
+                    if (e.key === 'Escape') {
+                        this.deselectElement();
                     }
                 });
                 
@@ -596,6 +656,124 @@
                 document.getElementById('viewportSize').addEventListener('change', (e) => {
                     this.setViewportSize(e.target.value);
                 });
+            }
+
+            setupFontSizeControls() {
+                // Element font size controls (8-500px)
+                const fontSizeSlider = document.getElementById('propFontSize');
+                const fontSizeInput = document.getElementById('propFontSizeInput');
+                const currentFontSizeSpan = document.getElementById('currentFontSize');
+                
+                // Sincronizza slider e input
+                fontSizeSlider.addEventListener('input', (e) => {
+                    const value = e.target.value;
+                    fontSizeInput.value = value;
+                    currentFontSizeSpan.textContent = `${value}px`;
+                });
+                
+                fontSizeInput.addEventListener('input', (e) => {
+                    let value = parseInt(e.target.value);
+                    // Limita il valore
+                    if (value < 8) value = 8;
+                    if (value > 500) value = 500;
+                    
+                    fontSizeSlider.value = value;
+                    currentFontSizeSpan.textContent = `${value}px`;
+                });
+                
+                fontSizeInput.addEventListener('change', (e) => {
+                    let value = parseInt(e.target.value);
+                    if (isNaN(value)) {
+                        value = 16;
+                        fontSizeInput.value = 16;
+                        fontSizeSlider.value = 16;
+                        currentFontSizeSpan.textContent = '16px';
+                    }
+                });
+                
+                // Bottoni +/-
+                document.querySelectorAll('.font-size-btn[data-action="increase"], .font-size-btn[data-action="decrease"]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const action = e.target.closest('.font-size-btn').dataset.action;
+                        let currentValue = parseInt(fontSizeSlider.value);
+                        
+                        if (action === 'increase') {
+                            currentValue += 1;
+                        } else if (action === 'decrease') {
+                            currentValue -= 1;
+                        }
+                        
+                        // Limita il valore
+                        if (currentValue < 8) currentValue = 8;
+                        if (currentValue > 500) currentValue = 500;
+                        
+                        fontSizeSlider.value = currentValue;
+                        fontSizeInput.value = currentValue;
+                        currentFontSizeSpan.textContent = `${currentValue}px`;
+                    });
+                });
+                
+                // Page base font size controls (8-72px)
+                const pageFontSizeSlider = document.getElementById('pageBaseFontSize');
+                const pageFontSizeInput = document.getElementById('pageBaseFontSizeInput');
+                
+                pageFontSizeSlider.addEventListener('input', (e) => {
+                    const value = e.target.value;
+                    pageFontSizeInput.value = value;
+                    this.pageSettings.baseFontSize = parseInt(value);
+                    this.saveToStorage();
+                });
+                
+                pageFontSizeInput.addEventListener('input', (e) => {
+                    let value = parseInt(e.target.value);
+                    if (value < 8) value = 8;
+                    if (value > 72) value = 72;
+                    
+                    pageFontSizeSlider.value = value;
+                    this.pageSettings.baseFontSize = value;
+                    this.saveToStorage();
+                });
+                
+                // Bottoni +/- per page font size
+                document.querySelectorAll('.font-size-btn[data-action="increase-page"], .font-size-btn[data-action="decrease-page"]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const action = e.target.closest('.font-size-btn').dataset.action;
+                        let currentValue = parseInt(pageFontSizeSlider.value);
+                        
+                        if (action === 'increase-page') {
+                            currentValue += 1;
+                        } else if (action === 'decrease-page') {
+                            currentValue -= 1;
+                        }
+                        
+                        if (currentValue < 8) currentValue = 8;
+                        if (currentValue > 72) currentValue = 72;
+                        
+                        pageFontSizeSlider.value = currentValue;
+                        pageFontSizeInput.value = currentValue;
+                        this.pageSettings.baseFontSize = currentValue;
+                        this.saveToStorage();
+                    });
+                });
+            }
+
+            setElementTextAlign(align) {
+                if (!this.selectedElement) return;
+                
+                const element = this.elements.find(el => el.id === this.selectedElement);
+                if (!element) return;
+                
+                element.styles.textAlign = align;
+                
+                // Update UI buttons
+                document.querySelectorAll('.text-align-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector(`.text-align-btn[data-align="${align}"]`).classList.add('active');
+                
+                this.renderElement(element);
+                this.saveToStorage();
+                this.showStatus(`Text alignment set to ${align}`);
             }
 
             setupDragAndDrop() {
@@ -1104,7 +1282,7 @@
 
             updatePropertiesPanel() {
                 if (!this.selectedElement) {
-                    document.getElementById('propertiesForm').style.display = 'none';
+                    document.querySelector('.no-selection')?.style.display || (document.getElementById('propertiesForm').style.display = 'none');
                     return;
                 }
                 
@@ -1126,6 +1304,16 @@
                 document.getElementById('propBorderRadius').value = parseInt(element.styles.borderRadius);
                 document.getElementById('propRadiusValue').textContent = `${parseInt(element.styles.borderRadius)}px`;
                 document.getElementById('propFontSize').value = parseInt(element.styles.fontSize);
+                document.getElementById('propFontSizeInput').value = parseInt(element.styles.fontSize);
+                document.getElementById('currentFontSize').textContent = `${parseInt(element.styles.fontSize)}px`;
+                document.getElementById('propFontWeight').value = element.styles.fontWeight || '400';
+                
+                // Update text align buttons
+                document.querySelectorAll('.text-align-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                const alignBtn = document.querySelector(`.text-align-btn[data-align="${element.styles.textAlign || 'left'}"]`);
+                if (alignBtn) alignBtn.classList.add('active');
                 
                 // Update page settings
                 document.getElementById('pageTitle').value = this.pageSettings.title;
@@ -1134,7 +1322,7 @@
                 document.getElementById('pageWidth').value = this.pageSettings.width;
                 document.getElementById('pageFontFamily').value = this.pageSettings.fontFamily;
                 document.getElementById('pageBaseFontSize').value = this.pageSettings.baseFontSize;
-                document.getElementById('pageBaseFontSizeValue').textContent = `${this.pageSettings.baseFontSize}px`;
+                document.getElementById('pageBaseFontSizeInput').value = this.pageSettings.baseFontSize;
             }
 
             applyProperties() {
@@ -1158,7 +1346,15 @@
                 element.styles.color = document.getElementById('propTextColor').value;
                 element.styles.opacity = parseInt(document.getElementById('propOpacity').value) / 100;
                 element.styles.borderRadius = `${document.getElementById('propBorderRadius').value}px`;
-                element.styles.fontSize = `${document.getElementById('propFontSize').value}px`;
+                
+                // Font size fino a 500px
+                let fontSize = parseInt(document.getElementById('propFontSize').value);
+                if (fontSize < 8) fontSize = 8;
+                if (fontSize > 500) fontSize = 500;
+                element.styles.fontSize = `${fontSize}px`;
+                
+                element.styles.fontWeight = document.getElementById('propFontWeight').value;
+                element.styles.textAlign = document.querySelector('.text-align-btn.active')?.dataset.align || 'left';
                 
                 // Update page settings
                 this.pageSettings.title = document.getElementById('pageTitle').value;
@@ -1288,6 +1484,8 @@
             background-color: ${el.styles.backgroundColor};
             color: ${el.styles.color};
             font-size: ${el.styles.fontSize};
+            font-weight: ${el.styles.fontWeight};
+            text-align: ${el.styles.textAlign};
             opacity: ${el.styles.opacity};
             border-radius: ${el.styles.borderRadius};
             padding: ${el.styles.padding};
@@ -1390,10 +1588,16 @@
                 window.open('frontend.html', '_blank');
             }
 
+            openDebug() {
+                window.open('debug.html', '_blank');
+            }
+
             copyCode() {
                 const code = document.getElementById('generatedCode').value;
                 navigator.clipboard.writeText(code).then(() => {
                     this.showStatus('HTML copied to clipboard');
+                }).catch(err => {
+                    this.showStatus('Failed to copy: ' + err, 'error');
                 });
             }
 
@@ -1401,6 +1605,8 @@
                 const css = document.getElementById('generatedCss').value;
                 navigator.clipboard.writeText(css).then(() => {
                     this.showStatus('CSS copied to clipboard');
+                }).catch(err => {
+                    this.showStatus('Failed to copy: ' + err, 'error');
                 });
             }
 
@@ -1416,10 +1622,16 @@
                 });
                 
                 // Show selected tab
-                document.getElementById(`tab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`).classList.add('active');
+                const tabElement = document.getElementById(`tab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`);
+                if (tabElement) {
+                    tabElement.classList.add('active');
+                }
                 
                 // Activate button
-                document.querySelector(`.tab-btn[data-tab="${tabName}"]`).classList.add('active');
+                const button = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+                if (button) {
+                    button.classList.add('active');
+                }
             }
 
             setZoom(level) {
@@ -1438,7 +1650,10 @@
                 };
                 
                 const width = sizes[size] || '992px';
-                document.querySelector('.page-boundary').style.width = width;
+                const pageBoundary = document.querySelector('.page-boundary');
+                if (pageBoundary) {
+                    pageBoundary.style.width = width;
+                }
                 document.getElementById('canvasSize').textContent = width.replace('px', '') + '×900';
             }
 
@@ -1455,7 +1670,9 @@
 
             centerView() {
                 const canvas = document.getElementById('pageContent');
-                canvas.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+                if (canvas) {
+                    canvas.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+                }
             }
 
             updateGrid() {
@@ -1506,7 +1723,10 @@
             }
 
             renderAllElements() {
-                document.getElementById('pageContent').innerHTML = '';
+                const pageContent = document.getElementById('pageContent');
+                if (!pageContent) return;
+                
+                pageContent.innerHTML = '';
                 this.elements.forEach(el => this.renderElement(el));
                 this.updateEmptyState();
                 
@@ -1526,8 +1746,16 @@
                     
                     if (savedData) {
                         this.elements = JSON.parse(savedData);
-                        this.elementCounter = this.elements.length > 0 ? 
-                            Math.max(...this.elements.map(el => parseInt(el.id.split('-')[1]) || 0)) + 1 : 1;
+                        // Calculate next element counter
+                        let maxId = 0;
+                        this.elements.forEach(el => {
+                            const match = el.id.match(/element-\d+-(\w+)/);
+                            if (match) {
+                                const num = parseInt(match[1], 36);
+                                if (num > maxId) maxId = num;
+                            }
+                        });
+                        this.elementCounter = maxId + 1;
                     }
                     
                     if (savedSettings) {
@@ -1537,6 +1765,7 @@
                     this.renderAllElements();
                 } catch (e) {
                     console.error('Error loading from storage:', e);
+                    this.showStatus('Error loading saved data', 'error');
                 }
             }
 
@@ -1568,7 +1797,12 @@
 
             showStatus(message, type = 'info') {
                 const statusEl = document.getElementById('statusMessage');
-                statusEl.innerHTML = `<i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i> ${message}`;
+                if (!statusEl) return;
+                
+                const icon = type === 'error' ? 'exclamation-circle' : 
+                            type === 'success' ? 'check-circle' : 'info-circle';
+                
+                statusEl.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
                 statusEl.className = `status-item ${type}`;
                 
                 // Clear after 3 seconds
@@ -1611,6 +1845,7 @@
                     this.selectElement(elementData.id);
                     this.saveToHistory();
                     this.saveToStorage();
+                    input.remove();
                 };
                 
                 input.addEventListener('blur', saveEdit);

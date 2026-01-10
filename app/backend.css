@@ -1,4 +1,3 @@
-/* Professional Web Builder Styles */
 :root {
     --primary-color: #3498db;
     --primary-dark: #2980b9;
@@ -1030,4 +1029,406 @@ body {
 
 .status-item.success {
     color: var(--success-color);
+}
+.font-size-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.font-size-btn {
+    width: 28px;
+    height: 28px;
+    background: var(--secondary-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-light);
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.font-size-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.font-size-input {
+    width: 60px;
+    padding: 6px;
+    background: var(--secondary-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-lighter);
+    text-align: center;
+    font-size: 13px;
+}
+
+.font-size-unit {
+    color: var(--text-light);
+    font-size: 13px;
+}
+
+/* Text Align Buttons */
+.text-align-buttons {
+    display: flex;
+    gap: 2px;
+    background: var(--secondary-dark);
+    padding: 4px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+.text-align-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-light);
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.text-align-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-lighter);
+}
+
+.text-align-btn.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Status Bar Updates */
+.status-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.status-btn:hover {
+    background: rgba(52, 152, 219, 0.1);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+#debugBtn:hover {
+    background: rgba(46, 204, 113, 0.1);
+    border-color: var(--success-color);
+    color: var(--success-color);
+}
+@media (max-width: 1400px) {
+    .font-size-control {
+        flex-wrap: wrap;
+    }
+    
+    .font-size-input {
+        order: 1;
+        margin-top: 5px;
+    }
+    
+    .font-size-unit {
+        order: 2;
+        margin-top: 5px;
+    }
+}
+.font-size-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 5px;
+    flex-wrap: wrap;
+}
+
+.font-size-slider {
+    flex: 1;
+    min-width: 150px;
+    height: 6px;
+    background: var(--secondary-dark);
+    border-radius: 3px;
+    outline: none;
+}
+
+.font-size-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.font-size-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.font-size-btn {
+    width: 32px;
+    height: 32px;
+    background: var(--secondary-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-light);
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.font-size-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
+}
+
+.font-size-input-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: auto;
+}
+
+.font-size-input {
+    width: 70px;
+    padding: 8px;
+    background: var(--secondary-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-lighter);
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.font-size-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.font-size-unit {
+    color: var(--text-light);
+    font-size: 13px;
+    font-weight: 500;
+    min-width: 20px;
+}
+
+/* Text Align Buttons */
+.text-align-buttons {
+    display: flex;
+    gap: 2px;
+    background: var(--secondary-dark);
+    padding: 4px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+.text-align-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-light);
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.text-align-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-lighter);
+}
+
+.text-align-btn.active {
+    background: var(--primary-color);
+    color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Status Bar Updates */
+.status-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-btn {
+    background: var(--secondary-dark);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.status-btn:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+#debugBtn:hover {
+    background: var(--success-color);
+    border-color: var(--success-color);
+    box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
+}
+
+#openFrontendBtn:hover {
+    background: var(--warning-color);
+    border-color: var(--warning-color);
+    box-shadow: 0 2px 8px rgba(243, 156, 18, 0.3);
+}
+
+/* Property item label adjustments */
+.property-item label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Better slider appearance */
+.slider-item input[type="range"] {
+    height: 6px;
+    background: var(--secondary-dark);
+    border-radius: 3px;
+    outline: none;
+}
+
+.slider-item input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.slider-item input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1400px) {
+    .font-size-control {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .font-size-slider {
+        order: 1;
+        width: 100%;
+    }
+    
+    .font-size-btn {
+        order: 2;
+        align-self: flex-start;
+    }
+    
+    .font-size-input-group {
+        order: 3;
+        margin-left: 0;
+        margin-top: 8px;
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+/* Animation for status */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.status-item.success {
+    color: var(--success-color);
+    animation: pulse 0.5s ease;
+}
+
+.status-item.error {
+    color: var(--danger-color);
+    animation: pulse 0.5s ease;
+}
+
+/* Tooltip for status buttons */
+.status-btn {
+    position: relative;
+}
+
+.status-btn::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--secondary-dark);
+    color: var(--text-lighter);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    border: 1px solid var(--border-color);
+    z-index: 1000;
+}
+
+.status-btn:hover::after {
+    opacity: 1;
 }
