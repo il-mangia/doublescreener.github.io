@@ -27,17 +27,17 @@ But you can also use DoubleScreener local:
 - Easy to use for students, teachers, or hobbyists  
 
 ### File Structure
-/app
-├── back-end.html      → visual editor (drag & drop)
-├── back-end.css       → editor styles
-├── front-end.html     → live preview page
-├── front-end.css      → page styles
+/app <br>
+├── back-end.html      <br>
+├── back-end.css       <br>
+├── front-end.html     <br>
+├── front-end.css      <br>
 
 ### Contributing
 Feel free to submit issues or pull requests.
 Suggestions for new features, animations, or usability improvements are very welcome!
 
 ### License
-There are NO licences..... there's why:
-[Free Software Foundation](https://www.fsf.org/)
-[Open Source](https://opensource.org/)
+This is a Free and Open Source Software:<br>
+- [Free Software Foundation](https://www.fsf.org/)<br>
+- [Open Source](https://opensource.org/)<br>
