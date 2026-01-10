@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Builder Sniffer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #1a1a1a;
+            color: #fff;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        h1 {
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #95a5a6;
+        }
+        
+        .panels {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 1024px) {
+            .panels {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: #2c3e50;
+            border-radius: 10px;
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        .panel h2 {
+            color: #3498db;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #34495e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .panel h2 i {
+            font-size: 1.2em;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            background: #34495e;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2ecc71;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #bdc3c7;
+            margin-top: 5px;
+        }
+        
+        .data-section {
+            margin-bottom: 25px;
+        }
+        
+        .data-section h3 {
+            color: #ecf0f1;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .data-box {
+            background: #34495e;
+            border-radius: 6px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .empty-data {
+            color: #95a5a6;
+            font-style: italic;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: #7f8c8d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #6c7b7d;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #2c3e50;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .auto-refresh {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .last-update {
+            color: #bdc3c7;
+            font-size: 0.9em;
+        }
+        
+        .timestamp {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        
+        .highlight {
+            background: rgba(52, 152, 219, 0.2);
+            padding: 2px 4px;
+            border-radius: 3px;
+            color: #3498db;
+        }
+        
+        .error {
+            background: rgba(231, 76, 60, 0.2);
+            padding: 2px 4px;
+            border-radius: 3px;
+            color: #e74c3c;
+        }
+        
+        .success {
+            background: rgba(46, 204, 113, 0.2);
+            padding: 2px 4px;
+            border-radius: 3px;
+            color: #2ecc71;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #34495e;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #3498db;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2980b9;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-bug"></i> Builder Debug Sniffer</h1>
+            <p class="subtitle">Real-time monitoring of localStorage data and builder state</p>
+        </header>
+        
+        <div class="controls">
+            <div class="auto-refresh">
+                <input type="checkbox" id="autoRefresh" class="checkbox" checked>
+                <label for="autoRefresh">Auto-refresh (every 2 seconds)</label>
+            </div>
+            <div class="last-update">
+                Last update: <span id="lastUpdateTime" class="timestamp">Never</span>
+            </div>
+            <div>
+                <button id="refreshBtn" class="btn btn-primary">
+                    <i class="fas fa-sync-alt"></i> Refresh Now
+                </button>
+            </div>
+        </div>
+        
+        <div class="panels">
+            <!-- Left Panel -->
+            <div class="panel">
+                <h2><i class="fas fa-database"></i> LocalStorage Data</h2>
+                
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalKeys">0</div>
+                        <div class="stat-label">Total Keys</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="pageDataSize">0 B</div>
+                        <div class="stat-label">pageData Size</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="htmlDataSize">0 B</div>
+                        <div class="stat-label">HTML Size</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="lastUpdate">-</div>
+                        <div class="stat-label">Last Save</div>
+                    </div>
+                </div>
+                
+                <div class="data-section">
+                    <h3>Key: <span class="highlight">generatedPageHTML</span></h3>
+                    <div class="data-box" id="htmlData">
+                        <div class="empty-data">No data found</div>
+                    </div>
+                </div>
+                
+                <div class="data-section">
+                    <h3>Key: <span class="highlight">pageData</span> (JSON elements)</h3>
+                    <div class="data-box" id="pageData">
+                        <div class="empty-data">No data found</div>
+                    </div>
+                </div>
+                
+                <div class="data-section">
+                    <h3>Key: <span class="highlight">lastUpdate</span></h3>
+                    <div class="data-box" id="lastUpdateData">
+                        <div class="empty-data">No data found</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Panel -->
+            <div class="panel">
+                <h2><i class="fas fa-cogs"></i> System Status & Actions</h2>
+                
+                <div class="data-section">
+                    <h3><i class="fas fa-info-circle"></i> Current Status</h3>
+                    <div class="data-box">
+                        <div id="statusChecks">
+                            <p><i class="fas fa-circle" style="color: #e74c3c"></i> Checking system...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Common Issues</h3>
+                    <div class="data-box">
+                        <p><strong>1. No HTML generated:</strong> Click "Apply Changes" in the builder</p>
+                        <p><strong>2. Frontend not updating:</strong> Check if localStorage is being saved</p>
+                        <p><strong>3. JSON parse errors:</strong> Clear corrupted data</p>
+                        <p><strong>4. Elements not showing:</strong> Verify element positions are valid</p>
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button id="testFrontendBtn" class="btn btn-primary">
+                        <i class="fas fa-eye"></i> Test Frontend View
+                    </button>
+                    <button id="openBuilderBtn" class="btn btn-secondary">
+                        <i class="fas fa-edit"></i> Open Builder
+                    </button>
+                    <button id="clearDataBtn" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Clear All Data
+                    </button>
+                    <button id="exportDataBtn" class="btn btn-secondary">
+                        <i class="fas fa-download"></i> Export Data
+                    </button>
+                </div>
+                
+                <div class="data-section">
+                    <h3><i class="fas fa-terminal"></i> Quick Tests</h3>
+                    <div class="data-box">
+                        <p>Run these commands in browser console:</p>
+                        <p><code class="highlight">localStorage.getItem('generatedPageHTML')</code> - Get saved HTML</p>
+                        <p><code class="highlight">localStorage.getItem('pageData')</code> - Get elements data</p>
+                        <p><code class="highlight">JSON.parse(localStorage.getItem('pageData'))</code> - Parse elements</p>
+                        <p><code class="highlight">localStorage.clear()</code> - Clear all data</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- All localStorage keys -->
+        <div class="panel">
+            <h2><i class="fas fa-key"></i> All LocalStorage Keys</h2>
+            <div class="data-box" id="allKeys">
+                <div class="empty-data">No keys found</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const htmlDataEl = document.getElementById('htmlData');
+        const pageDataEl = document.getElementById('pageData');
+        const lastUpdateDataEl = document.getElementById('lastUpdateData');
+        const allKeysEl = document.getElementById('allKeys');
+        const totalKeysEl = document.getElementById('totalKeys');
+        const pageDataSizeEl = document.getElementById('pageDataSize');
+        const htmlDataSizeEl = document.getElementById('htmlDataSize');
+        const lastUpdateEl = document.getElementById('lastUpdate');
+        const lastUpdateTimeEl = document.getElementById('lastUpdateTime');
+        const statusChecksEl = document.getElementById('statusChecks');
+        const autoRefreshCheckbox = document.getElementById('autoRefresh');
+        const refreshBtn = document.getElementById('refreshBtn');
+        
+        // State
+        let refreshInterval;
+        
+        // Format bytes to readable size
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Format timestamp
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return 'Never';
+            const date = new Date(parseInt(timestamp));
+            return date.toLocaleTimeString() + ' ' + date.toLocaleDateString();
+        }
+        
+        // Update all data displays
+        function updateAllData() {
+            // Update timestamp
+            const now = new Date();
+            lastUpdateTimeEl.textContent = now.toLocaleTimeString();
+            
+            // Get all localStorage keys
+            const keys = Object.keys(localStorage);
+            totalKeysEl.textContent = keys.length;
+            
+            // Display all keys
+            if (keys.length > 0) {
+                allKeysEl.innerHTML = keys.map(key => 
+                    `<div><span class="highlight">${key}</span>: ${localStorage.getItem(key).length} chars</div>`
+                ).join('');
+            } else {
+                allKeysEl.innerHTML = '<div class="empty-data">No keys found in localStorage</div>';
+            }
+            
+            // Check for builder-specific keys
+            const htmlData = localStorage.getItem('generatedPageHTML');
+            const pageData = localStorage.getItem('pageData');
+            const lastUpdate = localStorage.getItem('lastUpdate');
+            
+            // Update HTML data display
+            if (htmlData) {
+                const size = formatBytes(new Blob([htmlData]).size);
+                htmlDataSizeEl.textContent = size;
+                
+                // Truncate if too long
+                const displayHtml = htmlData.length > 1000 ? 
+                    htmlData.substring(0, 1000) + '... [TRUNCATED]' : 
+                    htmlData;
+                
+                htmlDataEl.innerHTML = `<div class="success">✓ HTML found (${htmlData.length} chars)</div>
+<hr style="margin: 10px 0; border-color: #34495e;">
+<pre>${escapeHtml(displayHtml)}</pre>`;
+            } else {
+                htmlDataSizeEl.textContent = '0 B';
+                htmlDataEl.innerHTML = '<div class="error">✗ No generatedPageHTML found in localStorage</div>';
+            }
+            
+            // Update pageData display
+            if (pageData) {
+                const size = formatBytes(new Blob([pageData]).size);
+                pageDataSizeEl.textContent = size;
+                
+                try {
+                    const parsedData = JSON.parse(pageData);
+                    const elementCount = Array.isArray(parsedData) ? parsedData.length : 'N/A';
+                    
+                    pageDataEl.innerHTML = `<div class="success">✓ JSON parsed successfully (${elementCount} elements)</div>
+<hr style="margin: 10px 0; border-color: #34495e;">
+<pre>${JSON.stringify(parsedData, null, 2)}</pre>`;
+                } catch (e) {
+                    pageDataEl.innerHTML = `<div class="error">✗ JSON parse error: ${e.message}</div>
+<hr style="margin: 10px 0; border-color: #34495e;">
+<pre>${escapeHtml(pageData)}</pre>`;
+                }
+            } else {
+                pageDataSizeEl.textContent = '0 B';
+                pageDataEl.innerHTML = '<div class="empty-data">No pageData found in localStorage</div>';
+            }
+            
+            // Update lastUpdate display
+            if (lastUpdate) {
+                lastUpdateEl.textContent = formatTimestamp(lastUpdate);
+                lastUpdateDataEl.textContent = `Timestamp: ${lastUpdate} (${formatTimestamp(lastUpdate)})`;
+            } else {
+                lastUpdateEl.textContent = 'Never';
+                lastUpdateDataEl.innerHTML = '<div class="empty-data">No lastUpdate timestamp found</div>';
+            }
+            
+            // Update status checks
+            updateStatusChecks(htmlData, pageData, lastUpdate);
+        }
+        
+        // Update status checks
+        function updateStatusChecks(htmlData, pageData, lastUpdate) {
+            let statusHTML = '';
+            
+            // Check 1: HTML exists
+            if (htmlData) {
+                statusHTML += `<p><i class="fas fa-check-circle" style="color: #2ecc71"></i> HTML data found (${htmlData.length} chars)</p>`;
+                
+                // Check if HTML is valid
+                if (htmlData.includes('<!DOCTYPE html>') && htmlData.includes('</html>')) {
+                    statusHTML += `<p><i class="fas fa-check-circle" style="color: #2ecc71"></i> HTML structure looks valid</p>`;
+                } else {
+                    statusHTML += `<p><i class="fas fa-exclamation-triangle" style="color: #f39c12"></i> HTML may be incomplete</p>`;
+                }
+            } else {
+                statusHTML += `<p><i class="fas fa-times-circle" style="color: #e74c3c"></i> No HTML data found</p>`;
+            }
+            
+            // Check 2: PageData exists
+            if (pageData) {
+                try {
+                    const parsed = JSON.parse(pageData);
+                    const elementCount = Array.isArray(parsed) ? parsed.length : 0;
+                    statusHTML += `<p><i class="fas fa-check-circle" style="color: #2ecc71"></i> PageData found (${elementCount} elements)</p>`;
+                } catch (e) {
+                    statusHTML += `<p><i class="fas fa-times-circle" style="color: #e74c3c"></i> PageData JSON is invalid: ${e.message}</p>`;
+                }
+            } else {
+                statusHTML += `<p><i class="fas fa-exclamation-triangle" style="color: #f39c12"></i> No PageData found (normal if no elements)</p>`;
+            }
+            
+            // Check 3: Last update
+            if (lastUpdate) {
+                const age = Date.now() - parseInt(lastUpdate);
+                const minutesAgo = Math.floor(age / 60000);
+                
+                if (minutesAgo < 5) {
+                    statusHTML += `<p><i class="fas fa-check-circle" style="color: #2ecc71"></i> Recently updated (${minutesAgo} min ago)</p>`;
+                } else {
+                    statusHTML += `<p><i class="fas fa-exclamation-triangle" style="color: #f39c12"></i> Last update ${minutesAgo} minutes ago</p>`;
+                }
+            } else {
+                statusHTML += `<p><i class="fas fa-exclamation-triangle" style="color: #f39c12"></i> No update timestamp recorded</p>`;
+            }
+            
+            // Check 4: Frontend test
+            if (htmlData && htmlData.includes('frontend.css')) {
+                statusHTML += `<p><i class="fas fa-check-circle" style="color: #2ecc71"></i> Frontend CSS reference found</p>`;
+            } else if (htmlData) {
+                statusHTML += `<p><i class="fas fa-exclamation-triangle" style="color: #f39c12"></i> Frontend CSS may be missing</p>`;
+            }
+            
+            statusChecksEl.innerHTML = statusHTML;
+        }
+        
+        // Escape HTML for safe display
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Setup auto-refresh
+        function setupAutoRefresh() {
+            if (autoRefreshCheckbox.checked) {
+                if (!refreshInterval) {
+                    refreshInterval = setInterval(updateAllData, 2000);
+                }
+            } else {
+                if (refreshInterval) {
+                    clearInterval(refreshInterval);
+                    refreshInterval = null;
+                }
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initial data load
+            updateAllData();
+            
+            // Setup auto-refresh
+            setupAutoRefresh();
+            
+            // Event listeners
+            autoRefreshCheckbox.addEventListener('change', setupAutoRefresh);
+            
+            refreshBtn.addEventListener('click', function() {
+                updateAllData();
+                // Visual feedback
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check"></i> Refreshed!';
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                }, 1000);
+            });
+            
+            // Test frontend button
+            document.getElementById('testFrontendBtn').addEventListener('click', function() {
+                const htmlData = localStorage.getItem('generatedPageHTML');
+                if (htmlData) {
+                    const testWindow = window.open();
+                    testWindow.document.write(htmlData);
+                    testWindow.document.close();
+                } else {
+                    alert('No HTML data found! Open builder and click "Apply Changes" first.');
+                }
+            });
+            
+            // Open builder button
+            document.getElementById('openBuilderBtn').addEventListener('click', function() {
+                window.open('backend.html', '_blank');
+            });
+            
+            // Clear data button
+            document.getElementById('clearDataBtn').addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear ALL localStorage data?\nThis will delete everything, not just builder data.')) {
+                    localStorage.clear();
+                    updateAllData();
+                    alert('All localStorage data cleared!');
+                }
+            });
+            
+            // Export data button
+            document.getElementById('exportDataBtn').addEventListener('click', function() {
+                const data = {
+                    generatedPageHTML: localStorage.getItem('generatedPageHTML'),
+                    pageData: localStorage.getItem('pageData'),
+                    lastUpdate: localStorage.getItem('lastUpdate'),
+                    timestamp: Date.now(),
+                    allData: {}
+                };
+                
+                // Add all localStorage items
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    data.allData[key] = localStorage.getItem(key);
+                }
+                
+                const dataStr = JSON.stringify(data, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                const url = URL.createObjectURL(dataBlob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `builder-export-${Date.now()}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                alert('Data exported successfully!');
+            });
+            
+            // Listen for storage events (when builder saves)
+            window.addEventListener('storage', function(event) {
+                console.log('Storage event detected:', event.key);
+                updateAllData();
+            });
+            
+            // Also listen for messages (if using postMessage)
+            window.addEventListener('message', function(event) {
+                if (event.data && event.data.type === 'pageUpdate') {
+                    console.log('Page update message received');
+                    updateAllData();
+                }
+            });
+        });
+        
+        // Also expose useful functions to console
+        window.debugBuilder = {
+            refresh: updateAllData,
+            getHTML: () => localStorage.getItem('generatedPageHTML'),
+            getElements: () => {
+                const data = localStorage.getItem('pageData');
+                return data ? JSON.parse(data) : null;
+            },
+            clearBuilderData: () => {
+                localStorage.removeItem('generatedPageHTML');
+                localStorage.removeItem('pageData');
+                localStorage.removeItem('lastUpdate');
+                updateAllData();
+            },
+            testFrontend: () => {
+                const html = localStorage.getItem('generatedPageHTML');
+                if (html) {
+                    const win = window.open();
+                    win.document.write(html);
+                    win.document.close();
+                }
+            }
+        };
+        
+        console.log('Builder Debug Sniffer loaded!');
+        console.log('Use window.debugBuilder for debugging functions');
+    </script>
+</body>
+</html>

@@ -1,11 +1,1635 @@
-<!DOCTYPE HTML>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>WORK IN PROGRESS</title>
-    <link rel = "Stylesheet" href = "backend.css.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Web Builder - Professional Editor</title>
+    <link rel="stylesheet" href="backend.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <h1>Backend in progress</h1>
-    <h3>Please check back later</h3>
+    <div class="app-container">
+        <!-- Top Toolbar -->
+        <header class="header">
+            <div class="logo-section">
+                <i class="fas fa-cube"></i>
+                <h1>Visual Builder</h1>
+                <span class="version">PRO</span>
+            </div>
+            
+            <div class="toolbar-actions">
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" id="undoBtn" title="Undo (Ctrl+Z)">
+                        <i class="fas fa-undo"></i>
+                    </button>
+                    <button class="toolbar-btn" id="redoBtn" title="Redo (Ctrl+Y)">
+                        <i class="fas fa-redo"></i>
+                    </button>
+                    <div class="separator"></div>
+                    <button class="toolbar-btn" id="gridToggle" title="Toggle Grid">
+                        <i class="fas fa-th"></i>
+                    </button>
+                    <button class="toolbar-btn" id="snapToggle" title="Snap to Grid">
+                        <i class="fas fa-magnet"></i>
+                    </button>
+                </div>
+                
+                <div class="toolbar-group">
+                    <button class="btn btn-outline" id="previewBtn" title="Preview (Ctrl+P)">
+                        <i class="fas fa-eye"></i> Preview
+                    </button>
+                    <button class="btn btn-primary" id="saveBtn" title="Publish (Ctrl+S)">
+                        <i class="fas fa-rocket"></i> Publish
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <div class="workspace">
+            <!-- Left Sidebar - Components -->
+            <aside class="sidebar left-sidebar">
+                <div class="sidebar-header">
+                    <h2><i class="fas fa-shapes"></i> Components</h2>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search components..." id="componentSearch">
+                    </div>
+                </div>
+                
+                <div class="components-grid">
+                    <div class="component-card" draggable="true" data-type="text">
+                        <div class="component-icon">
+                            <i class="fas fa-text-height"></i>
+                        </div>
+                        <div class="component-info">
+                            <h4>Text</h4>
+                            <p>Paragraph, headings</p>
+                        </div>
+                    </div>
+                    
+                    <div class="component-card" draggable="true" data-type="button">
+                        <div class="component-icon">
+                            <i class="fas fa-square"></i>
+                        </div>
+                        <div class="component-info">
+                            <h4>Button</h4>
+                            <p>Call to action</p>
+                        </div>
+                    </div>
+                    
+                    <div class="component-card" draggable="true" data-type="image">
+                        <div class="component-icon">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <div class="component-info">
+                            <h4>Image</h4>
+                            <p>Local or URL</p>
+                        </div>
+                    </div>
+                    
+                    <div class="component-card" draggable="true" data-type="container">
+                        <div class="component-icon">
+                            <i class="fas fa-square-full"></i>
+                        </div>
+                        <div class="component-info">
+                            <h4>Container</h4>
+                            <p>Group elements</p>
+                        </div>
+                    </div>
+                    
+                    <div class="component-card" draggable="true" data-type="divider">
+                        <div class="component-icon">
+                            <i class="fas fa-grip-lines"></i>
+                        </div>
+                        <div class="component-info">
+                            <h4>Divider</h4>
+                            <p>Horizontal line</p>
+                        </div>
+                    </div>
+                    
+                    <div class="component-card" draggable="true" data-type="icon">
+                        <div class="component-icon">
+                            <i class="fas fa-icons"></i>
+                        </div>
+                        <div class="component-info">
+                            <h4>Icon</h4>
+                            <p>Font Awesome icons</p>
+                        </div>
+                    </div>
+                    
+                    <div class="component-card" draggable="true" data-type="card">
+                        <div class="component-icon">
+                            <i class="fas fa-id-card"></i>
+                        </div>
+                        <div class="component-info">
+                            <h4>Card</h4>
+                            <p>Content container</p>
+                        </div>
+                    </div>
+                    
+                    <div class="component-card" draggable="true" data-type="input">
+                        <div class="component-icon">
+                            <i class="fas fa-keyboard"></i>
+                        </div>
+                        <div class="component-info">
+                            <h4>Input</h4>
+                            <p>Text field</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-footer">
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-value" id="elementCount">0</span>
+                            <span class="stat-label">Elements</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="selectedCount">0</span>
+                            <span class="stat-label">Selected</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Center Canvas -->
+            <main class="canvas-area">
+                <div class="canvas-toolbar">
+                    <div class="canvas-info">
+                        <div class="viewport-size">
+                            <i class="fas fa-desktop"></i>
+                            <select id="viewportSize">
+                                <option value="desktop">Desktop (1440px)</option>
+                                <option value="laptop">Laptop (1024px)</option>
+                                <option value="tablet">Tablet (768px)</option>
+                                <option value="mobile">Mobile (375px)</option>
+                            </select>
+                        </div>
+                        <div class="zoom-control">
+                            <button class="zoom-btn" id="zoomOut">-</button>
+                            <span id="zoomLevel">100%</span>
+                            <button class="zoom-btn" id="zoomIn">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="canvas-actions">
+                        <button class="btn btn-sm btn-outline" id="clearCanvasBtn">
+                            <i class="fas fa-broom"></i> Clear All
+                        </button>
+                        <button class="btn btn-sm btn-outline" id="centerViewBtn">
+                            <i class="fas fa-crosshairs"></i> Center View
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="canvas-wrapper">
+                    <div id="canvas" class="canvas">
+                        <div class="canvas-background">
+                            <div class="page-boundary">
+                                <div class="page-header">
+                                    <i class="fas fa-file-alt"></i>
+                                    <span>Page Canvas</span>
+                                </div>
+                                <div class="page-content" id="pageContent">
+                                    <!-- Elements will be placed here -->
+                                    <div class="empty-canvas">
+                                        <div class="empty-content">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                            <h3>Drag components here</h3>
+                                            <p>Start building by dragging components from the left panel</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Selection guides -->
+                    <div class="selection-guides" id="selectionGuides">
+                        <div class="guide horizontal top"></div>
+                        <div class="guide horizontal bottom"></div>
+                        <div class="guide vertical left"></div>
+                        <div class="guide vertical right"></div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Right Sidebar - Properties -->
+            <aside class="sidebar right-sidebar">
+                <div class="sidebar-header">
+                    <h2><i class="fas fa-sliders-h"></i> Properties</h2>
+                    <div class="property-tabs" id="propertyTabs">
+                        <button class="tab-btn active" data-tab="element">Element</button>
+                        <button class="tab-btn" data-tab="page">Page</button>
+                        <button class="tab-btn" data-tab="code">Code</button>
+                    </div>
+                </div>
+                
+                <div class="properties-content">
+                    <!-- Element Properties -->
+                    <div class="tab-content active" id="tabElement">
+                        <div class="property-group">
+                            <h3><i class="fas fa-edit"></i> Content</h3>
+                            <div class="property-item">
+                                <label>Text Content</label>
+                                <textarea id="propContent" placeholder="Enter text..."></textarea>
+                            </div>
+                            <div class="property-item">
+                                <label>Image URL</label>
+                                <div class="input-with-action">
+                                    <input type="text" id="propImageUrl" placeholder="https://example.com/image.jpg">
+                                    <button class="input-action" title="Browse">
+                                        <i class="fas fa-folder-open"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="property-group">
+                            <h3><i class="fas fa-ruler-combined"></i> Dimensions</h3>
+                            <div class="dimension-grid">
+                                <div class="dimension-item">
+                                    <label>X</label>
+                                    <input type="number" id="propPosX" min="0">
+                                </div>
+                                <div class="dimension-item">
+                                    <label>Y</label>
+                                    <input type="number" id="propPosY" min="0">
+                                </div>
+                                <div class="dimension-item">
+                                    <label>Width</label>
+                                    <input type="number" id="propWidth" min="20" max="2000">
+                                </div>
+                                <div class="dimension-item">
+                                    <label>Height</label>
+                                    <input type="number" id="propHeight" min="20" max="2000">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="property-group">
+                            <h3><i class="fas fa-palette"></i> Appearance</h3>
+                            <div class="color-pickers">
+                                <div class="color-picker">
+                                    <label>Background</label>
+                                    <div class="color-input">
+                                        <input type="color" id="propBgColor" value="#ffffff">
+                                        <input type="text" id="propBgColorHex" value="#ffffff">
+                                    </div>
+                                </div>
+                                <div class="color-picker">
+                                    <label>Text</label>
+                                    <div class="color-input">
+                                        <input type="color" id="propTextColor" value="#000000">
+                                        <input type="text" id="propTextColorHex" value="#000000">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="slider-group">
+                                <div class="slider-item">
+                                    <label>Opacity: <span id="propOpacityValue">100%</span></label>
+                                    <input type="range" id="propOpacity" min="0" max="100" value="100">
+                                </div>
+                                <div class="slider-item">
+                                    <label>Border Radius: <span id="propRadiusValue">0px</span></label>
+                                    <input type="range" id="propBorderRadius" min="0" max="50" value="0">
+                                </div>
+                            </div>
+                            
+                            <div class="property-item">
+                                <label>Font Size</label>
+                                <select id="propFontSize">
+                                    <option value="12">12px - Small</option>
+                                    <option value="14">14px - Normal</option>
+                                    <option value="16" selected>16px - Base</option>
+                                    <option value="18">18px - Large</option>
+                                    <option value="24">24px - Heading</option>
+                                    <option value="32">32px - Title</option>
+                                    <option value="48">48px - Display</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="property-group">
+                            <h3><i class="fas fa-border-style"></i> Border</h3>
+                            <div class="border-controls">
+                                <div class="border-item">
+                                    <label>Width</label>
+                                    <select id="propBorderWidth">
+                                        <option value="0">None</option>
+                                        <option value="1">1px</option>
+                                        <option value="2">2px</option>
+                                        <option value="3">3px</option>
+                                        <option value="4">4px</option>
+                                        <option value="5">5px</option>
+                                    </select>
+                                </div>
+                                <div class="border-item">
+                                    <label>Style</label>
+                                    <select id="propBorderStyle">
+                                        <option value="solid">Solid</option>
+                                        <option value="dashed">Dashed</option>
+                                        <option value="dotted">Dotted</option>
+                                        <option value="double">Double</option>
+                                    </select>
+                                </div>
+                                <div class="border-item">
+                                    <label>Color</label>
+                                    <input type="color" id="propBorderColor" value="#cccccc">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="property-actions">
+                            <button class="btn btn-primary" id="applyPropertiesBtn">
+                                <i class="fas fa-check"></i> Apply
+                            </button>
+                            <button class="btn btn-outline" id="duplicateBtn">
+                                <i class="fas fa-clone"></i> Duplicate
+                            </button>
+                            <button class="btn btn-danger" id="deleteBtn">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Page Properties -->
+                    <div class="tab-content" id="tabPage">
+                        <div class="property-group">
+                            <h3><i class="fas fa-globe"></i> Page Settings</h3>
+                            <div class="property-item">
+                                <label>Page Title</label>
+                                <input type="text" id="pageTitle" value="My Page" placeholder="Page title...">
+                            </div>
+                            <div class="property-item">
+                                <label>Background Color</label>
+                                <input type="color" id="pageBgColor" value="#f8f9fa">
+                            </div>
+                            <div class="property-item">
+                                <label>Background Image</label>
+                                <div class="input-with-action">
+                                    <input type="text" id="pageBgImage" placeholder="https://example.com/bg.jpg">
+                                    <button class="input-action" title="Clear">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="property-item">
+                                <label>Page Width</label>
+                                <select id="pageWidth">
+                                    <option value="100%">Full Width</option>
+                                    <option value="1200px">Desktop (1200px)</option>
+                                    <option value="992px" selected>Standard (992px)</option>
+                                    <option value="768px">Tablet (768px)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="property-group">
+                            <h3><i class="fas fa-font"></i> Typography</h3>
+                            <div class="property-item">
+                                <label>Font Family</label>
+                                <select id="pageFontFamily">
+                                    <option value="'Segoe UI', sans-serif">Segoe UI</option>
+                                    <option value="Arial, sans-serif">Arial</option>
+                                    <option value="'Helvetica Neue', sans-serif">Helvetica</option>
+                                    <option value="Georgia, serif">Georgia</option>
+                                    <option value="'Times New Roman', serif">Times New Roman</option>
+                                    <option value="'Courier New', monospace">Courier New</option>
+                                </select>
+                            </div>
+                            <div class="property-item">
+                                <label>Base Font Size</label>
+                                <input type="range" id="pageBaseFontSize" min="12" max="20" value="16">
+                                <span class="range-value" id="pageBaseFontSizeValue">16px</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Code View -->
+                    <div class="tab-content" id="tabCode">
+                        <div class="property-group">
+                            <h3><i class="fas fa-code"></i> Generated HTML</h3>
+                            <div class="code-editor">
+                                <div class="code-header">
+                                    <span>index.html</span>
+                                    <button class="code-action" id="copyCodeBtn">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <textarea id="generatedCode" readonly></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="property-group">
+                            <h3><i class="fas fa-css3"></i> CSS Styles</h3>
+                            <div class="code-editor">
+                                <div class="code-header">
+                                    <span>styles.css</span>
+                                    <button class="code-action" id="copyCssBtn">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <textarea id="generatedCss" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Status Bar -->
+        <footer class="status-bar">
+            <div class="status-left">
+                <span class="status-item">
+                    <i class="fas fa-mouse-pointer"></i>
+                    <span id="cursorPosition">X: 0, Y: 0</span>
+                </span>
+                <span class="status-item">
+                    <i class="fas fa-expand-alt"></i>
+                    <span id="canvasSize">1440×900</span>
+                </span>
+            </div>
+            
+            <div class="status-center">
+                <span class="status-item" id="statusMessage">
+                    <i class="fas fa-info-circle"></i> Ready
+                </span>
+            </div>
+            
+            <div class="status-right">
+                <span class="status-item">
+                    <i class="fas fa-database"></i>
+                    <span id="storageStatus">Auto-saved</span>
+                </span>
+                <button class="status-btn" id="openFrontendBtn" title="Open Frontend">
+                    <i class="fas fa-external-link-alt"></i>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Resize Handles Template -->
+    <template id="resizeHandlesTemplate">
+        <div class="resize-handle nw" data-direction="nw"></div>
+        <div class="resize-handle ne" data-direction="ne"></div>
+        <div class="resize-handle sw" data-direction="sw"></div>
+        <div class="resize-handle se" data-direction="se"></div>
+        <div class="resize-handle n" data-direction="n"></div>
+        <div class="resize-handle e" data-direction="e"></div>
+        <div class="resize-handle s" data-direction="s"></div>
+        <div class="resize-handle w" data-direction="w"></div>
+    </template>
+
+    <script>
+        // Professional Web Builder - Complete Solution
+        class WebBuilder {
+            constructor() {
+                this.elements = [];
+                this.selectedElement = null;
+                this.history = [];
+                this.historyIndex = -1;
+                this.zoom = 1;
+                this.gridEnabled = true;
+                this.snapEnabled = true;
+                this.snapSize = 10;
+                this.pageSettings = {
+                    title: 'My Page',
+                    backgroundColor: '#f8f9fa',
+                    backgroundImage: '',
+                    width: '992px',
+                    fontFamily: "'Segoe UI', sans-serif",
+                    baseFontSize: 16
+                };
+                this.isDragging = false;
+                this.isResizing = false;
+                this.resizeDirection = null;
+                this.currentTool = 'select';
+                this.init();
+            }
+
+            init() {
+                this.loadFromStorage();
+                this.setupEventListeners();
+                this.setupDragAndDrop();
+                this.updateUI();
+                this.setupCanvas();
+                this.showStatus('Ready to build');
+            }
+
+            setupEventListeners() {
+                // Toolbar buttons
+                document.getElementById('saveBtn').addEventListener('click', () => this.savePage());
+                document.getElementById('previewBtn').addEventListener('click', () => this.previewPage());
+                document.getElementById('clearCanvasBtn').addEventListener('click', () => this.clearCanvas());
+                document.getElementById('gridToggle').addEventListener('click', () => this.toggleGrid());
+                document.getElementById('snapToggle').addEventListener('click', () => this.toggleSnap());
+                document.getElementById('undoBtn').addEventListener('click', () => this.undo());
+                document.getElementById('redoBtn').addEventListener('click', () => this.redo());
+                document.getElementById('centerViewBtn').addEventListener('click', () => this.centerView());
+                
+                // Zoom controls
+                document.getElementById('zoomIn').addEventListener('click', () => this.setZoom(this.zoom + 0.1));
+                document.getElementById('zoomOut').addEventListener('click', () => this.setZoom(this.zoom - 0.1));
+                
+                // Property tabs
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const tab = e.target.dataset.tab;
+                        this.switchTab(tab);
+                    });
+                });
+                
+                // Property inputs
+                document.getElementById('applyPropertiesBtn').addEventListener('click', () => this.applyProperties());
+                document.getElementById('duplicateBtn').addEventListener('click', () => this.duplicateElement());
+                document.getElementById('deleteBtn').addEventListener('click', () => this.deleteElement());
+                document.getElementById('copyCodeBtn').addEventListener('click', () => this.copyCode());
+                document.getElementById('copyCssBtn').addEventListener('click', () => this.copyCss());
+                document.getElementById('openFrontendBtn').addEventListener('click', () => this.openFrontend());
+                
+                // Page properties
+                document.getElementById('pageTitle').addEventListener('input', (e) => {
+                    this.pageSettings.title = e.target.value;
+                    this.saveToStorage();
+                });
+                
+                // Real-time sliders
+                document.getElementById('propOpacity').addEventListener('input', (e) => {
+                    document.getElementById('propOpacityValue').textContent = `${e.target.value}%`;
+                });
+                
+                document.getElementById('propBorderRadius').addEventListener('input', (e) => {
+                    document.getElementById('propRadiusValue').textContent = `${e.target.value}px`;
+                });
+                
+                document.getElementById('pageBaseFontSize').addEventListener('input', (e) => {
+                    document.getElementById('pageBaseFontSizeValue').textContent = `${e.target.value}px`;
+                    this.pageSettings.baseFontSize = parseInt(e.target.value);
+                    this.saveToStorage();
+                });
+                
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    // Delete key
+                    if (e.key === 'Delete' && this.selectedElement) {
+                        this.deleteElement();
+                    }
+                    // Ctrl+Z/Y for undo/redo
+                    if (e.ctrlKey || e.metaKey) {
+                        if (e.key === 'z') {
+                            e.preventDefault();
+                            this.undo();
+                        } else if (e.key === 'y') {
+                            e.preventDefault();
+                            this.redo();
+                        } else if (e.key === 's') {
+                            e.preventDefault();
+                            this.savePage();
+                        }
+                    }
+                });
+                
+                // Viewport size change
+                document.getElementById('viewportSize').addEventListener('change', (e) => {
+                    this.setViewportSize(e.target.value);
+                });
+            }
+
+            setupDragAndDrop() {
+                const canvas = document.getElementById('pageContent');
+                
+                // Component drag start
+                document.querySelectorAll('.component-card').forEach(card => {
+                    card.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('component', card.dataset.type);
+                        card.classList.add('dragging');
+                    });
+                    
+                    card.addEventListener('dragend', () => {
+                        card.classList.remove('dragging');
+                    });
+                });
+                
+                // Canvas drop zone
+                canvas.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    canvas.classList.add('drag-over');
+                    
+                    // Update cursor position
+                    const rect = canvas.getBoundingClientRect();
+                    const x = Math.round((e.clientX - rect.left) / this.zoom);
+                    const y = Math.round((e.clientY - rect.top) / this.zoom);
+                    
+                    // Show drop indicator
+                    this.showDropIndicator(x, y);
+                });
+                
+                canvas.addEventListener('dragleave', () => {
+                    canvas.classList.remove('drag-over');
+                    this.hideDropIndicator();
+                });
+                
+                canvas.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    canvas.classList.remove('drag-over');
+                    this.hideDropIndicator();
+                    
+                    const componentType = e.dataTransfer.getData('component');
+                    if (!componentType) return;
+                    
+                    const rect = canvas.getBoundingClientRect();
+                    let x = Math.round((e.clientX - rect.left) / this.zoom);
+                    let y = Math.round((e.clientY - rect.top) / this.zoom);
+                    
+                    // Apply snapping
+                    if (this.snapEnabled) {
+                        x = Math.round(x / this.snapSize) * this.snapSize;
+                        y = Math.round(y / this.snapSize) * this.snapSize;
+                    }
+                    
+                    this.addElement(componentType, x, y);
+                });
+                
+                // Mouse move tracking
+                canvas.addEventListener('mousemove', (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const x = Math.round((e.clientX - rect.left) / this.zoom);
+                    const y = Math.round((e.clientY - rect.top) / this.zoom);
+                    
+                    document.getElementById('cursorPosition').textContent = `X: ${x}, Y: ${y}`;
+                });
+            }
+
+            setupCanvas() {
+                const canvas = document.getElementById('pageContent');
+                
+                // Click to select/deselect
+                canvas.addEventListener('click', (e) => {
+                    if (e.target === canvas || e.target.classList.contains('empty-canvas')) {
+                        this.deselectElement();
+                    }
+                });
+                
+                // Setup grid
+                this.updateGrid();
+            }
+
+            addElement(type, x, y) {
+                const element = {
+                    id: `element-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    type: type,
+                    x: x,
+                    y: y,
+                    width: this.getDefaultWidth(type),
+                    height: this.getDefaultHeight(type),
+                    content: this.getDefaultContent(type),
+                    styles: this.getDefaultStyles(type),
+                    zIndex: this.elements.length + 1
+                };
+                
+                this.elements.push(element);
+                this.saveToHistory();
+                this.renderElement(element);
+                this.selectElement(element.id);
+                this.updateUI();
+                this.saveToStorage();
+                
+                this.showStatus(`Added ${type} element`);
+            }
+
+            getDefaultWidth(type) {
+                const defaults = {
+                    text: 200,
+                    button: 120,
+                    image: 250,
+                    container: 300,
+                    divider: 400,
+                    icon: 50,
+                    card: 280,
+                    input: 200
+                };
+                return defaults[type] || 200;
+            }
+
+            getDefaultHeight(type) {
+                const defaults = {
+                    text: 'auto',
+                    button: 40,
+                    image: 150,
+                    container: 200,
+                    divider: 2,
+                    icon: 50,
+                    card: 180,
+                    input: 40
+                };
+                return defaults[type];
+            }
+
+            getDefaultContent(type) {
+                const defaults = {
+                    text: 'Your text here...',
+                    button: 'Click Me',
+                    image: '<div class="image-placeholder"><i class="fas fa-image"></i><span>Image</span></div>',
+                    container: '<div class="container-content">Container</div>',
+                    divider: '',
+                    icon: '<i class="fas fa-star"></i>',
+                    card: '<div class="card-content"><h4>Card Title</h4><p>Card content goes here</p></div>',
+                    input: '<input type="text" placeholder="Enter text...">'
+                };
+                return defaults[type] || '';
+            }
+
+            getDefaultStyles(type) {
+                const base = {
+                    backgroundColor: type === 'button' ? '#3498db' : '#ffffff',
+                    color: type === 'button' ? '#ffffff' : '#333333',
+                    fontSize: '16px',
+                    fontWeight: 'normal',
+                    textAlign: 'left',
+                    opacity: 1,
+                    borderRadius: type === 'button' ? '4px' : '0px',
+                    borderWidth: '0px',
+                    borderStyle: 'solid',
+                    borderColor: '#cccccc',
+                    padding: type === 'button' ? '10px 20px' : '15px'
+                };
+                
+                if (type === 'divider') {
+                    base.backgroundColor = '#dddddd';
+                    base.height = '2px';
+                }
+                
+                if (type === 'card') {
+                    base.backgroundColor = '#ffffff';
+                    base.borderWidth = '1px';
+                    base.borderColor = '#e0e0e0';
+                    base.borderRadius = '8px';
+                    base.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                }
+                
+                return base;
+            }
+
+            renderElement(element) {
+                // Remove if exists
+                const existing = document.getElementById(element.id);
+                if (existing) existing.remove();
+                
+                const div = document.createElement('div');
+                div.id = element.id;
+                div.className = `element ${element.type}-element`;
+                div.style.cssText = this.getElementStyles(element);
+                div.innerHTML = element.content;
+                
+                // Add resize handles
+                const handles = document.getElementById('resizeHandlesTemplate').content.cloneNode(true);
+                div.appendChild(handles);
+                
+                // Make draggable and resizable
+                this.makeInteractive(div, element);
+                
+                document.getElementById('pageContent').appendChild(div);
+                
+                // Update empty state
+                this.updateEmptyState();
+            }
+
+            getElementStyles(element) {
+                return `
+                    position: absolute;
+                    left: ${element.x}px;
+                    top: ${element.y}px;
+                    width: ${element.width}px;
+                    height: ${element.height === 'auto' ? 'auto' : element.height + 'px'};
+                    background-color: ${element.styles.backgroundColor};
+                    color: ${element.styles.color};
+                    font-size: ${element.styles.fontSize};
+                    font-weight: ${element.styles.fontWeight};
+                    text-align: ${element.styles.textAlign};
+                    opacity: ${element.styles.opacity};
+                    border-radius: ${element.styles.borderRadius};
+                    border-width: ${element.styles.borderWidth};
+                    border-style: ${element.styles.borderStyle};
+                    border-color: ${element.styles.borderColor};
+                    padding: ${element.styles.padding};
+                    box-shadow: ${element.styles.boxShadow || 'none'};
+                    cursor: move;
+                    user-select: none;
+                    z-index: ${element.zIndex};
+                    min-height: ${element.type === 'text' ? 'auto' : '20px'};
+                    overflow: ${element.height === 'auto' ? 'visible' : 'hidden'};
+                `;
+            }
+
+            makeInteractive(elementDiv, elementData) {
+                let isDragging = false;
+                let isResizing = false;
+                let resizeDirection = null;
+                let startX, startY, startWidth, startHeight, startLeft, startTop;
+                
+                // Drag functionality
+                elementDiv.addEventListener('mousedown', (e) => {
+                    if (e.target.classList.contains('resize-handle')) {
+                        // Start resizing
+                        isResizing = true;
+                        resizeDirection = e.target.dataset.direction;
+                        this.startResize(elementDiv, elementData, e);
+                    } else {
+                        // Start dragging
+                        isDragging = true;
+                        this.startDrag(elementDiv, elementData, e);
+                    }
+                    
+                    this.selectElement(elementData.id);
+                    e.stopPropagation();
+                });
+                
+                // Mouse move handler
+                const onMouseMove = (e) => {
+                    if (isResizing) {
+                        this.handleResize(elementDiv, elementData, e, resizeDirection);
+                    } else if (isDragging) {
+                        this.handleDrag(elementDiv, elementData, e);
+                    }
+                };
+                
+                // Mouse up handler
+                const onMouseUp = () => {
+                    if (isDragging || isResizing) {
+                        this.saveToHistory();
+                        this.saveToStorage();
+                    }
+                    isDragging = false;
+                    isResizing = false;
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                };
+                
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+                
+                // Double click to edit
+                elementDiv.addEventListener('dblclick', (e) => {
+                    if (elementData.type === 'text') {
+                        this.editText(elementDiv, elementData);
+                    }
+                });
+            }
+
+            startDrag(elementDiv, elementData, e) {
+                this.isDragging = true;
+                this.dragStartX = e.clientX;
+                this.dragStartY = e.clientY;
+                this.dragStartLeft = elementData.x;
+                this.dragStartTop = elementData.y;
+                
+                elementDiv.style.zIndex = 9999;
+                elementDiv.classList.add('dragging');
+                
+                // Show selection guides
+                this.showSelectionGuides(elementDiv);
+            }
+
+            handleDrag(elementDiv, elementData, e) {
+                if (!this.isDragging) return;
+                
+                let dx = (e.clientX - this.dragStartX) / this.zoom;
+                let dy = (e.clientY - this.dragStartY) / this.zoom;
+                
+                // Apply snapping
+                if (this.snapEnabled) {
+                    dx = Math.round(dx / this.snapSize) * this.snapSize;
+                    dy = Math.round(dy / this.snapSize) * this.snapSize;
+                }
+                
+                const newX = this.dragStartLeft + dx;
+                const newY = this.dragStartTop + dy;
+                
+                // Update element
+                elementData.x = Math.max(0, newX);
+                elementData.y = Math.max(0, newY);
+                
+                // Apply to DOM
+                elementDiv.style.left = `${elementData.x}px`;
+                elementDiv.style.top = `${elementData.y}px`;
+                
+                // Update properties panel
+                this.updatePropertiesPanel();
+                
+                // Update guides
+                this.updateSelectionGuides(elementDiv);
+            }
+
+            startResize(elementDiv, elementData, e) {
+                this.isResizing = true;
+                this.resizeStartX = e.clientX;
+                this.resizeStartY = e.clientY;
+                this.resizeStartWidth = elementData.width;
+                this.resizeStartHeight = elementData.height === 'auto' ? 100 : elementData.height;
+                this.resizeStartLeft = elementData.x;
+                this.resizeStartTop = elementData.y;
+                
+                elementDiv.style.zIndex = 9999;
+                elementDiv.classList.add('resizing');
+            }
+
+            handleResize(elementDiv, elementData, e, direction) {
+                if (!this.isResizing) return;
+                
+                const dx = (e.clientX - this.resizeStartX) / this.zoom;
+                const dy = (e.clientY - this.resizeStartY) / this.zoom;
+                
+                let newWidth = this.resizeStartWidth;
+                let newHeight = this.resizeStartHeight;
+                let newX = elementData.x;
+                let newY = elementData.y;
+                
+                // Handle different resize directions
+                switch(direction) {
+                    case 'e':
+                        newWidth = Math.max(20, this.resizeStartWidth + dx);
+                        break;
+                    case 'w':
+                        newWidth = Math.max(20, this.resizeStartWidth - dx);
+                        newX = this.resizeStartLeft + dx;
+                        break;
+                    case 's':
+                        newHeight = Math.max(20, this.resizeStartHeight + dy);
+                        break;
+                    case 'n':
+                        newHeight = Math.max(20, this.resizeStartHeight - dy);
+                        newY = this.resizeStartTop + dy;
+                        break;
+                    case 'se':
+                        newWidth = Math.max(20, this.resizeStartWidth + dx);
+                        newHeight = Math.max(20, this.resizeStartHeight + dy);
+                        break;
+                    case 'sw':
+                        newWidth = Math.max(20, this.resizeStartWidth - dx);
+                        newHeight = Math.max(20, this.resizeStartHeight + dy);
+                        newX = this.resizeStartLeft + dx;
+                        break;
+                    case 'ne':
+                        newWidth = Math.max(20, this.resizeStartWidth + dx);
+                        newHeight = Math.max(20, this.resizeStartHeight - dy);
+                        newY = this.resizeStartTop + dy;
+                        break;
+                    case 'nw':
+                        newWidth = Math.max(20, this.resizeStartWidth - dx);
+                        newHeight = Math.max(20, this.resizeStartHeight - dy);
+                        newX = this.resizeStartLeft + dx;
+                        newY = this.resizeStartTop + dy;
+                        break;
+                }
+                
+                // Apply snapping
+                if (this.snapEnabled) {
+                    newWidth = Math.round(newWidth / this.snapSize) * this.snapSize;
+                    newHeight = Math.round(newHeight / this.snapSize) * this.snapSize;
+                    newX = Math.round(newX / this.snapSize) * this.snapSize;
+                    newY = Math.round(newY / this.snapSize) * this.snapSize;
+                }
+                
+                // Update element
+                elementData.width = newWidth;
+                if (elementData.height !== 'auto') {
+                    elementData.height = newHeight;
+                }
+                elementData.x = Math.max(0, newX);
+                elementData.y = Math.max(0, newY);
+                
+                // Apply to DOM
+                elementDiv.style.width = `${newWidth}px`;
+                if (elementData.height !== 'auto') {
+                    elementDiv.style.height = `${newHeight}px`;
+                }
+                elementDiv.style.left = `${elementData.x}px`;
+                elementDiv.style.top = `${elementData.y}px`;
+                
+                // Update properties panel
+                this.updatePropertiesPanel();
+                
+                // Update guides
+                this.updateSelectionGuides(elementDiv);
+            }
+
+            selectElement(id) {
+                // Deselect previous
+                if (this.selectedElement) {
+                    const prev = document.getElementById(this.selectedElement);
+                    if (prev) {
+                        prev.classList.remove('selected');
+                        prev.style.zIndex = this.elements.find(el => el.id === this.selectedElement)?.zIndex || 10;
+                    }
+                }
+                
+                // Select new
+                this.selectedElement = id;
+                const element = document.getElementById(id);
+                if (element) {
+                    element.classList.add('selected');
+                    element.style.zIndex = 9999;
+                    this.showSelectionGuides(element);
+                    this.updatePropertiesPanel();
+                    this.updateUI();
+                }
+            }
+
+            deselectElement() {
+                if (this.selectedElement) {
+                    const element = document.getElementById(this.selectedElement);
+                    if (element) {
+                        element.classList.remove('selected');
+                        element.style.zIndex = this.elements.find(el => el.id === this.selectedElement)?.zIndex || 10;
+                    }
+                    this.hideSelectionGuides();
+                    this.selectedElement = null;
+                    this.updatePropertiesPanel();
+                    this.updateUI();
+                }
+            }
+
+            showSelectionGuides(element) {
+                const guides = document.getElementById('selectionGuides');
+                guides.style.display = 'block';
+                this.updateSelectionGuides(element);
+            }
+
+            updateSelectionGuides(element) {
+                if (!element || !this.selectedElement) return;
+                
+                const rect = element.getBoundingClientRect();
+                const canvasRect = document.getElementById('pageContent').getBoundingClientRect();
+                
+                const guides = document.getElementById('selectionGuides');
+                const guideTop = guides.querySelector('.top');
+                const guideBottom = guides.querySelector('.bottom');
+                const guideLeft = guides.querySelector('.left');
+                const guideRight = guides.querySelector('.right');
+                
+                const top = rect.top - canvasRect.top;
+                const left = rect.left - canvasRect.left;
+                
+                guideTop.style.top = `${top}px`;
+                guideTop.style.left = `${left}px`;
+                guideTop.style.width = `${rect.width}px`;
+                
+                guideBottom.style.top = `${top + rect.height}px`;
+                guideBottom.style.left = `${left}px`;
+                guideBottom.style.width = `${rect.width}px`;
+                
+                guideLeft.style.top = `${top}px`;
+                guideLeft.style.left = `${left}px`;
+                guideLeft.style.height = `${rect.height}px`;
+                
+                guideRight.style.top = `${top}px`;
+                guideRight.style.left = `${left + rect.width}px`;
+                guideRight.style.height = `${rect.height}px`;
+            }
+
+            hideSelectionGuides() {
+                document.getElementById('selectionGuides').style.display = 'none';
+            }
+
+            showDropIndicator(x, y) {
+                // Implementation for drop indicator
+            }
+
+            hideDropIndicator() {
+                // Implementation for drop indicator
+            }
+
+            updatePropertiesPanel() {
+                if (!this.selectedElement) {
+                    document.getElementById('propertiesForm').style.display = 'none';
+                    return;
+                }
+                
+                const element = this.elements.find(el => el.id === this.selectedElement);
+                if (!element) return;
+                
+                // Update form values
+                document.getElementById('propPosX').value = element.x;
+                document.getElementById('propPosY').value = element.y;
+                document.getElementById('propWidth').value = element.width;
+                document.getElementById('propHeight').value = element.height === 'auto' ? 100 : element.height;
+                document.getElementById('propContent').value = element.content.replace(/<[^>]*>/g, '');
+                document.getElementById('propBgColor').value = element.styles.backgroundColor;
+                document.getElementById('propBgColorHex').value = element.styles.backgroundColor;
+                document.getElementById('propTextColor').value = element.styles.color;
+                document.getElementById('propTextColorHex').value = element.styles.color;
+                document.getElementById('propOpacity').value = element.styles.opacity * 100;
+                document.getElementById('propOpacityValue').textContent = `${element.styles.opacity * 100}%`;
+                document.getElementById('propBorderRadius').value = parseInt(element.styles.borderRadius);
+                document.getElementById('propRadiusValue').textContent = `${parseInt(element.styles.borderRadius)}px`;
+                document.getElementById('propFontSize').value = parseInt(element.styles.fontSize);
+                
+                // Update page settings
+                document.getElementById('pageTitle').value = this.pageSettings.title;
+                document.getElementById('pageBgColor').value = this.pageSettings.backgroundColor;
+                document.getElementById('pageBgImage').value = this.pageSettings.backgroundImage;
+                document.getElementById('pageWidth').value = this.pageSettings.width;
+                document.getElementById('pageFontFamily').value = this.pageSettings.fontFamily;
+                document.getElementById('pageBaseFontSize').value = this.pageSettings.baseFontSize;
+                document.getElementById('pageBaseFontSizeValue').textContent = `${this.pageSettings.baseFontSize}px`;
+            }
+
+            applyProperties() {
+                if (!this.selectedElement) return;
+                
+                const element = this.elements.find(el => el.id === this.selectedElement);
+                if (!element) return;
+                
+                // Update element properties
+                element.x = parseInt(document.getElementById('propPosX').value) || 0;
+                element.y = parseInt(document.getElementById('propPosY').value) || 0;
+                element.width = parseInt(document.getElementById('propWidth').value) || 100;
+                
+                const height = parseInt(document.getElementById('propHeight').value);
+                if (element.height !== 'auto') {
+                    element.height = height || 100;
+                }
+                
+                element.content = `<div>${document.getElementById('propContent').value}</div>`;
+                element.styles.backgroundColor = document.getElementById('propBgColor').value;
+                element.styles.color = document.getElementById('propTextColor').value;
+                element.styles.opacity = parseInt(document.getElementById('propOpacity').value) / 100;
+                element.styles.borderRadius = `${document.getElementById('propBorderRadius').value}px`;
+                element.styles.fontSize = `${document.getElementById('propFontSize').value}px`;
+                
+                // Update page settings
+                this.pageSettings.title = document.getElementById('pageTitle').value;
+                this.pageSettings.backgroundColor = document.getElementById('pageBgColor').value;
+                this.pageSettings.backgroundImage = document.getElementById('pageBgImage').value;
+                this.pageSettings.width = document.getElementById('pageWidth').value;
+                this.pageSettings.fontFamily = document.getElementById('pageFontFamily').value;
+                this.pageSettings.baseFontSize = parseInt(document.getElementById('pageBaseFontSize').value);
+                
+                // Re-render element
+                this.renderElement(element);
+                this.selectElement(element.id);
+                this.saveToHistory();
+                this.saveToStorage();
+                
+                this.showStatus('Properties applied');
+            }
+
+            duplicateElement() {
+                if (!this.selectedElement) return;
+                
+                const original = this.elements.find(el => el.id === this.selectedElement);
+                if (!original) return;
+                
+                const duplicate = JSON.parse(JSON.stringify(original));
+                duplicate.id = `element-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                duplicate.x += 20;
+                duplicate.y += 20;
+                duplicate.zIndex = this.elements.length + 1;
+                
+                this.elements.push(duplicate);
+                this.renderElement(duplicate);
+                this.selectElement(duplicate.id);
+                this.saveToHistory();
+                this.saveToStorage();
+                this.updateUI();
+                
+                this.showStatus('Element duplicated');
+            }
+
+            deleteElement() {
+                if (!this.selectedElement) return;
+                
+                if (!confirm('Delete this element?')) return;
+                
+                const element = document.getElementById(this.selectedElement);
+                if (element) element.remove();
+                
+                this.elements = this.elements.filter(el => el.id !== this.selectedElement);
+                this.deselectElement();
+                this.saveToHistory();
+                this.saveToStorage();
+                this.updateUI();
+                this.updateEmptyState();
+                
+                this.showStatus('Element deleted');
+            }
+
+            clearCanvas() {
+                if (!confirm('Clear the entire canvas?')) return;
+                
+                this.elements = [];
+                this.selectedElement = null;
+                document.getElementById('pageContent').innerHTML = '<div class="empty-canvas"><div class="empty-content"><i class="fas fa-cloud-upload-alt"></i><h3>Drag components here</h3><p>Start building by dragging components from the left panel</p></div></div>';
+                this.hideSelectionGuides();
+                this.saveToHistory();
+                this.saveToStorage();
+                this.updateUI();
+                
+                this.showStatus('Canvas cleared');
+            }
+
+            updateEmptyState() {
+                const emptyCanvas = document.querySelector('.empty-canvas');
+                if (this.elements.length === 0) {
+                    if (!emptyCanvas) {
+                        const emptyContent = document.createElement('div');
+                        emptyContent.className = 'empty-canvas';
+                        emptyContent.innerHTML = '<div class="empty-content"><i class="fas fa-cloud-upload-alt"></i><h3>Drag components here</h3><p>Start building by dragging components from the left panel</p></div>';
+                        document.getElementById('pageContent').appendChild(emptyContent);
+                    }
+                } else if (emptyCanvas) {
+                    emptyCanvas.remove();
+                }
+            }
+
+            savePage() {
+                // Generate HTML
+                let html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${this.pageSettings.title}</title>
+    <link rel="stylesheet" href="frontend.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: ${this.pageSettings.fontFamily};
+            font-size: ${this.pageSettings.baseFontSize}px;
+            background-color: ${this.pageSettings.backgroundColor};
+            ${this.pageSettings.backgroundImage ? `background-image: url('${this.pageSettings.backgroundImage}'); background-size: cover;` : ''}
+            min-height: 100vh;
+        }
+        .page-wrapper {
+            max-width: ${this.pageSettings.width};
+            margin: 0 auto;
+            position: relative;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">`;
+                
+                // Add elements
+                this.elements.forEach(el => {
+                    html += `
+        <div id="${el.id}" class="frontend-element ${el.type}-element" style="
+            position: absolute;
+            left: ${el.x}px;
+            top: ${el.y}px;
+            width: ${el.width}px;
+            height: ${el.height === 'auto' ? 'auto' : el.height + 'px'};
+            background-color: ${el.styles.backgroundColor};
+            color: ${el.styles.color};
+            font-size: ${el.styles.fontSize};
+            opacity: ${el.styles.opacity};
+            border-radius: ${el.styles.borderRadius};
+            padding: ${el.styles.padding};
+            border: ${el.styles.borderWidth} ${el.styles.borderStyle} ${el.styles.borderColor};
+            box-shadow: ${el.styles.boxShadow || 'none'};
+            z-index: ${el.zIndex};
+        ">
+            ${el.content}
+        </div>`;
+                });
+                
+                html += `
+    </div>
+</body>
+</html>`;
+                
+                // Save to localStorage
+                localStorage.setItem('generatedPageHTML', html);
+                localStorage.setItem('pageData', JSON.stringify(this.elements));
+                localStorage.setItem('pageSettings', JSON.stringify(this.pageSettings));
+                localStorage.setItem('lastUpdate', Date.now().toString());
+                
+                // Update code view
+                document.getElementById('generatedCode').value = html;
+                
+                // Generate CSS
+                let css = `/* Generated CSS */
+.frontend-element {
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.button-element {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.button-element:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.button-element button {
+    background: transparent;
+    border: none;
+    color: inherit;
+    font-size: inherit;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.image-element img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-element {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.card-element:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.input-element input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font-size: inherit;
+    padding: 10px;
+    outline: none;
+}
+
+.icon-element {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}`;
+                
+                document.getElementById('generatedCss').value = css;
+                
+                this.showStatus('Page published successfully!');
+            }
+
+            previewPage() {
+                this.savePage();
+                window.open('frontend.html', '_blank');
+            }
+
+            openFrontend() {
+                window.open('frontend.html', '_blank');
+            }
+
+            copyCode() {
+                const code = document.getElementById('generatedCode').value;
+                navigator.clipboard.writeText(code).then(() => {
+                    this.showStatus('HTML copied to clipboard');
+                });
+            }
+
+            copyCss() {
+                const css = document.getElementById('generatedCss').value;
+                navigator.clipboard.writeText(css).then(() => {
+                    this.showStatus('CSS copied to clipboard');
+                });
+            }
+
+            switchTab(tabName) {
+                // Hide all tabs
+                document.querySelectorAll('.tab-content').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                
+                // Remove active from all buttons
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Show selected tab
+                document.getElementById(`tab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`).classList.add('active');
+                
+                // Activate button
+                document.querySelector(`.tab-btn[data-tab="${tabName}"]`).classList.add('active');
+            }
+
+            setZoom(level) {
+                this.zoom = Math.max(0.3, Math.min(2, level));
+                document.getElementById('zoomLevel').textContent = `${Math.round(this.zoom * 100)}%`;
+                document.getElementById('pageContent').style.transform = `scale(${this.zoom})`;
+                document.getElementById('pageContent').style.transformOrigin = 'top left';
+            }
+
+            setViewportSize(size) {
+                const sizes = {
+                    desktop: '1440px',
+                    laptop: '1024px',
+                    tablet: '768px',
+                    mobile: '375px'
+                };
+                
+                const width = sizes[size] || '992px';
+                document.querySelector('.page-boundary').style.width = width;
+                document.getElementById('canvasSize').textContent = width.replace('px', '') + '×900';
+            }
+
+            toggleGrid() {
+                this.gridEnabled = !this.gridEnabled;
+                document.getElementById('canvas').classList.toggle('grid-enabled', this.gridEnabled);
+                document.getElementById('gridToggle').classList.toggle('active', this.gridEnabled);
+            }
+
+            toggleSnap() {
+                this.snapEnabled = !this.snapEnabled;
+                document.getElementById('snapToggle').classList.toggle('active', this.snapEnabled);
+            }
+
+            centerView() {
+                const canvas = document.getElementById('pageContent');
+                canvas.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+            }
+
+            updateGrid() {
+                const canvas = document.getElementById('canvas');
+                if (this.gridEnabled) {
+                    canvas.classList.add('grid-enabled');
+                } else {
+                    canvas.classList.remove('grid-enabled');
+                }
+            }
+
+            saveToHistory() {
+                // Limit history to 50 states
+                if (this.history.length > 50) {
+                    this.history.shift();
+                }
+                
+                this.history.push({
+                    elements: JSON.parse(JSON.stringify(this.elements)),
+                    selectedElement: this.selectedElement
+                });
+                
+                this.historyIndex = this.history.length - 1;
+            }
+
+            undo() {
+                if (this.historyIndex > 0) {
+                    this.historyIndex--;
+                    const state = this.history[this.historyIndex];
+                    this.elements = JSON.parse(JSON.stringify(state.elements));
+                    this.selectedElement = state.selectedElement;
+                    this.renderAllElements();
+                    this.updateUI();
+                    this.showStatus('Undo');
+                }
+            }
+
+            redo() {
+                if (this.historyIndex < this.history.length - 1) {
+                    this.historyIndex++;
+                    const state = this.history[this.historyIndex];
+                    this.elements = JSON.parse(JSON.stringify(state.elements));
+                    this.selectedElement = state.selectedElement;
+                    this.renderAllElements();
+                    this.updateUI();
+                    this.showStatus('Redo');
+                }
+            }
+
+            renderAllElements() {
+                document.getElementById('pageContent').innerHTML = '';
+                this.elements.forEach(el => this.renderElement(el));
+                this.updateEmptyState();
+                
+                if (this.selectedElement) {
+                    const element = document.getElementById(this.selectedElement);
+                    if (element) {
+                        element.classList.add('selected');
+                        this.showSelectionGuides(element);
+                    }
+                }
+            }
+
+            loadFromStorage() {
+                try {
+                    const savedData = localStorage.getItem('pageData');
+                    const savedSettings = localStorage.getItem('pageSettings');
+                    
+                    if (savedData) {
+                        this.elements = JSON.parse(savedData);
+                        this.elementCounter = this.elements.length > 0 ? 
+                            Math.max(...this.elements.map(el => parseInt(el.id.split('-')[1]) || 0)) + 1 : 1;
+                    }
+                    
+                    if (savedSettings) {
+                        this.pageSettings = JSON.parse(savedSettings);
+                    }
+                    
+                    this.renderAllElements();
+                } catch (e) {
+                    console.error('Error loading from storage:', e);
+                }
+            }
+
+            saveToStorage() {
+                localStorage.setItem('pageData', JSON.stringify(this.elements));
+                localStorage.setItem('pageSettings', JSON.stringify(this.pageSettings));
+            }
+
+            updateUI() {
+                document.getElementById('elementCount').textContent = this.elements.length;
+                document.getElementById('selectedCount').textContent = this.selectedElement ? '1' : '0';
+                
+                // Update storage status
+                const lastUpdate = localStorage.getItem('lastUpdate');
+                if (lastUpdate) {
+                    const time = new Date(parseInt(lastUpdate));
+                    const now = new Date();
+                    const diff = Math.floor((now - time) / 1000);
+                    
+                    if (diff < 60) {
+                        document.getElementById('storageStatus').textContent = 'Just now';
+                    } else if (diff < 3600) {
+                        document.getElementById('storageStatus').textContent = `${Math.floor(diff / 60)}m ago`;
+                    } else {
+                        document.getElementById('storageStatus').textContent = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    }
+                }
+            }
+
+            showStatus(message, type = 'info') {
+                const statusEl = document.getElementById('statusMessage');
+                statusEl.innerHTML = `<i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i> ${message}`;
+                statusEl.className = `status-item ${type}`;
+                
+                // Clear after 3 seconds
+                setTimeout(() => {
+                    if (statusEl.textContent.includes(message)) {
+                        statusEl.innerHTML = '<i class="fas fa-info-circle"></i> Ready';
+                        statusEl.className = 'status-item';
+                    }
+                }, 3000);
+            }
+
+            editText(elementDiv, elementData) {
+                // Implementation for inline text editing
+                const text = elementData.content.replace(/<[^>]*>/g, '');
+                const input = document.createElement('textarea');
+                input.value = text;
+                input.style.cssText = `
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    border: 2px solid #3498db;
+                    background: white;
+                    font-size: inherit;
+                    font-family: inherit;
+                    padding: inherit;
+                    resize: none;
+                    outline: none;
+                    z-index: 10000;
+                `;
+                
+                elementDiv.appendChild(input);
+                input.focus();
+                input.select();
+                
+                const saveEdit = () => {
+                    elementData.content = `<div>${input.value}</div>`;
+                    this.renderElement(elementData);
+                    this.selectElement(elementData.id);
+                    this.saveToHistory();
+                    this.saveToStorage();
+                };
+                
+                input.addEventListener('blur', saveEdit);
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && e.ctrlKey) {
+                        saveEdit();
+                    } else if (e.key === 'Escape') {
+                        input.remove();
+                        this.renderElement(elementData);
+                        this.selectElement(elementData.id);
+                    }
+                });
+            }
+        }
+
+        // Initialize the builder when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.builder = new WebBuilder();
+        });
+    </script>
 </body>
 </html>
