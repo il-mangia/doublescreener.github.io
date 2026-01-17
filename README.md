@@ -7,7 +7,7 @@ For more info or for the program documentation, see the [Wiki Page](https://gith
 
 ## Usage
 You can use DoubleScreener [**online**](https://il-mangia.github.io/doublescreener.github.io/) <br>
-But you can also use DoubleScreener local:
+But you can also use DoubleScreener local by:
 1. Clone the repository or download the ZIP:  
    ```bash
    git clone https://github.com/il-mangia/doublescreener.github.io.git
