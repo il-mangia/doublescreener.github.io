@@ -1,0 +1,73 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "doublescreener"
+version = "2.0.0.dev0"
+description = "Regia desktop e second screen per presentazioni HTML e PDF"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "GPL-3.0-only"
+license-files = ["LICENSE"]
+authors = [{ name = "il-mangia and DoubleScreener contributors" }]
+keywords = ["presentation", "second-screen", "editor", "pdf", "pyqt6"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: X11 Applications :: Qt",
+  "Intended Audience :: Education",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: MacOS",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Multimedia :: Graphics :: Presentation",
+]
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "pydantic>=2.8",
+  "python-multipart>=0.0.9",
+  "platformdirs>=4.2",
+  "segno>=1.6",
+  "Pillow>=10.3",
+  "PyMuPDF>=1.24",
+]
+
+[project.optional-dependencies]
+gui = [
+  "PyQt6>=6.8",
+  "PyQt6-WebEngine>=6.8",
+]
+dev = [
+  "pytest>=8.2",
+  "pytest-asyncio>=0.23",
+  "httpx>=0.27",
+  "ruff>=0.5",
+]
+
+[project.scripts]
+doublescreener = "doublescreener.__main__:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/doublescreener"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["doublescreener"]

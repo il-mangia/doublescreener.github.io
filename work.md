@@ -775,23 +775,23 @@ Legenda: `[ ]` da fare · `[~]` in corso · `[x]` fatto
 - [x] Branch `v2-rewrite` creato da `main`
 - [x] `work.md` committato
 - [x] `LICENSE` con GNU GPL v3.0, nota di licenza in README e link nel footer della landing
-- [ ] `pyproject.toml` con dipendenze ed extra `dev` (`license = "GPL-3.0-only"`)
-- [ ] `.gitignore` (`data/`, `.venv/`, `__pycache__/`, `*.pyc`, `build/`, `dist/`, `.ruff_cache/`)
-- [ ] Struttura cartelle `src/doublescreener/**` con `__init__.py` minimi
-- [ ] `config.py` + `logging_setup.py` + CLI (`--data-dir`, `--port`, `--debug`)
-- [ ] `python -m doublescreener --help` funzionante
-- [ ] Smoke test: QApplication vuota che si apre e si chiude
+- [x] `pyproject.toml` con dipendenze ed extra `dev` (`license = "GPL-3.0-only"`)
+- [x] `.gitignore` (`data/`, `.venv/`, `__pycache__/`, `*.pyc`, `build/`, `dist/`, `.ruff_cache/`)
+- [~] Struttura cartelle `src/doublescreener/**` con `__init__.py` minimi (`core` e `ui` pronti, `server`/`web` in M2–M3)
+- [x] `config.py` + `logging_setup.py` + CLI (`--data-dir`, `--port`, `--debug`)
+- [x] `python -m doublescreener --help` funzionante
+- [ ] Smoke test: QApplication vuota che si apre e si chiude (richiede extra `gui`, in M6)
 
 ### M1 — Core e persistenza (1–2 giornate)
 
-- [ ] Modelli Pydantic: `Project`, `Slide`, `Element`, `Rect`, `Style`, `Transition`, `PdfRef`
-- [ ] Validazione: id univoci, riferimenti asset esistenti, limiti canvas
-- [ ] `Store` JSON: list/create/get/update/delete, scritture atomiche, `.bak`
-- [ ] Lock per progetto + lock directory dati
-- [ ] `assets.py`: upload, hash SHA-256 per dedupe, probing dimensioni
-- [ ] `history.py`: comandi, undo/redo, coalescing, limite
-- [ ] `migrate(data)` con `schema_version`
-- [ ] Test: `test_models.py`, `test_store.py`, `test_history.py` (>80% coverage sui moduli core)
+- [x] Modelli Pydantic: `Project`, `Slide`, `Element`, `Rect`, `Style`, `Transition`, `PdfRef`
+- [x] Validazione: id univoci, riferimenti asset esistenti, limiti canvas
+- [x] `Store` JSON: list/create/get/update/delete, scritture atomiche, `.bak`
+- [x] Lock per progetto + lock directory dati
+- [x] `assets.py`: upload, hash SHA-256 per dedupe, probing dimensioni
+- [x] `history.py`: comandi, undo/redo, coalescing, limite
+- [x] `migrate(data)` con `schema_version`
+- [x] Test: `test_models.py`, `test_store.py`, `test_history.py` (63 test totali, tutti verdi)
 
 ### M2 — API (1 giornata)
 
