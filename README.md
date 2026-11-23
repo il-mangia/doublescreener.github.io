@@ -38,6 +38,13 @@ Feel free to submit issues or pull requests.
 Suggestions for new features, animations, or usability improvements are very welcome!
 
 ### License
-This is a Free and Open Source Software:<br>
-- [Free Software Foundation](https://www.fsf.org/)<br>
-- [Open Source](https://opensource.org/)<br>
+
+DoubleScreener is free software, released under the **GNU General Public License v3.0** (GPL-3.0-only).
+You can use, study, modify and redistribute it under the terms of that license.
+
+See [LICENSE](LICENSE) for the full text.
+
+Copyright (C) 2026 il-mangia and DoubleScreener contributors.
+
+> **Why GPLv3?** The v2 desktop app is built with PyQt6, which is distributed under GPLv3.
+> A permissive license (MIT/Apache) would require migrating the desktop app to PySide6 (LGPL).

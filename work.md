@@ -727,7 +727,7 @@ La repo è `doublescreener.github.io`, quindi il sito vive sul branch `main`. Re
 
 **Nessuna dipendenza Node.js.** Nessun bundler, nessun transpiler.
 
-**Nota licenza:** PyQt6 è distribuito sotto GPLv3; il progetto attuale si dichiara libero/open source. Se si vuole una licenza permissiva (MIT/Apache), l'alternativa compatibile a livello API è **PySide6** (LGPL). Decisione rimandata, ma da affrontare prima della release.
+**Licenza:** il progetto è rilasciato sotto **GPL-3.0-only** (file `LICENSE`). La scelta deriva da PyQt6, distribuito sotto GPLv3. Se in futuro servisse una licenza permissiva (MIT/Apache), l'alternativa compatibile a livello API è **PySide6** (LGPL), con migrazione da pianificare a parte. In `pyproject.toml` va dichiarato `license = "GPL-3.0-only"`.
 
 ---
 
@@ -773,8 +773,9 @@ Legenda: `[ ]` da fare · `[~]` in corso · `[x]` fatto
 ### M0 — Fondamenta (0,5 giornata)
 
 - [x] Branch `v2-rewrite` creato da `main`
-- [ ] `work.md` committato
-- [ ] `pyproject.toml` con dipendenze ed extra `dev`
+- [x] `work.md` committato
+- [x] `LICENSE` con GNU GPL v3.0, nota di licenza in README e link nel footer della landing
+- [ ] `pyproject.toml` con dipendenze ed extra `dev` (`license = "GPL-3.0-only"`)
 - [ ] `.gitignore` (`data/`, `.venv/`, `__pycache__/`, `*.pyc`, `build/`, `dist/`, `.ruff_cache/`)
 - [ ] Struttura cartelle `src/doublescreener/**` con `__init__.py` minimi
 - [ ] `config.py` + `logging_setup.py` + CLI (`--data-dir`, `--port`, `--debug`)
@@ -937,7 +938,7 @@ Legenda: `[ ]` da fare · `[~]` in corso · `[x]` fatto
 
 | Rischio | Impatto | Mitigazione |
 |---|---|---|
-| PyQt6 GPLv3 incompatibile con licenza permissiva | alto | decidere licenza; fallback PySide6 (API quasi identiche) |
+| Licenza permissiva richiesta in futuro | medio | il progetto è GPL-3.0-only per via di PyQt6; fallback PySide6 (LGPL) con migrazione pianificata |
 | QWebEngineView instabile/GPU su alcuni Windows | medio | flag software rendering attivabile, log, versione Qt pinnata |
 | PDF enormi o pagine giganti | medio | render on demand, limite dimensioni, timeout, cache |
 | Wi-Fi debole in aula | medio | payload leggeri, preload, riconnessione, indicatore qualità |
@@ -953,16 +954,15 @@ Legenda: `[ ]` da fare · `[~]` in corso · `[x]` fatto
 
 ## 24. Domande aperte
 
-1. **Licenza:** GPLv3 (coerente con PyQt6) o passaggio a PySide6 + MIT/Apache?
-2. **Elementi extra v1:** servono video, iframe, icone, tabelle o gruppi?
-3. **Allineamento:** in v1 basta lo snap o servono allinea/distribuisci espliciti?
-4. **Font:** solo font di sistema o download di Google Fonts per uso offline?
-5. **Note relatore:** in v1 solo testo in regia o anche finestra separata sul monitor del presentatore?
-6. **Telecomando:** supporto a clicker/presenter USB (tasti Pagina su/giù) in v1?
-7. **Tema visivo:** mantenere l'identità attuale (blu/verde) o nuovo design system?
-8. **Destinazione dell'app v1:** resta demo in `app/` o va spostata in `legacy/`?
-9. **Limiti:** dimensione massima asset, numero massimo slide, durata cache PDF?
-10. **Export PDF del deck:** utile in v1 o rimandato?
+1. **Elementi extra v1:** servono video, iframe, icone, tabelle o gruppi?
+2. **Allineamento:** in v1 basta lo snap o servono allinea/distribuisci espliciti?
+3. **Font:** solo font di sistema o download di Google Fonts per uso offline?
+4. **Note relatore:** in v1 solo testo in regia o anche finestra separata sul monitor del presentatore?
+5. **Telecomando:** supporto a clicker/presenter USB (tasti Pagina su/giù) in v1?
+6. **Tema visivo:** mantenere l'identità attuale (blu/verde) o nuovo design system?
+7. **Destinazione dell'app v1:** resta demo in `app/` o va spostata in `legacy/`?
+8. **Limiti:** dimensione massima asset, numero massimo slide, durata cache PDF?
+9. **Export PDF del deck:** utile in v1 o rimandato?
 
 ---
 
@@ -970,6 +970,7 @@ Legenda: `[ ]` da fare · `[~]` in corso · `[x]` fatto
 
 | Data | Decisione | Motivazione |
 |---|---|---|
+| 2026-11-23 | Licenza **GPL-3.0-only** | PyQt6 è GPLv3: coerenza legale senza cambiare framework |
 | 2026-11-23 | Riscrittura completa, branch `v2-rewrite` | il codice v1 è monolitico e basato su `localStorage` |
 | 2026-11-23 | Backend FastAPI + Uvicorn | WebSocket nativi, async, OpenAPI, ecosistema |
 | 2026-11-23 | Regia in PyQt6, canvas in QWebEngineView | pannelli nativi + resa identica al player |
