@@ -795,12 +795,12 @@ Legenda: `[ ]` da fare · `[~]` in corso · `[x]` fatto
 
 ### M2 — API (1 giornata)
 
-- [ ] `app_factory.py` con router, gestione errori, OpenAPI
-- [ ] CRUD progetti + duplicate + `If-Match`
-- [ ] Upload/download asset
-- [ ] `GET /api/info` con IP LAN e URL player
-- [ ] Mount statici `/p`, `/player`, `/editor-canvas`, `/assets`
-- [ ] Test `test_api.py` con `httpx` (CRUD, upload, errori, conflitti)
+- [x] `app_factory.py` con router, gestione errori, OpenAPI
+- [x] CRUD progetti + duplicate + `If-Match`
+- [x] Upload/download asset
+- [x] `GET /api/info` con IP LAN e URL player
+- [ ] Mount statici `/p`, `/player`, `/editor-canvas`, `/assets` (in M3, insieme al player)
+- [x] Test `test_api.py` con `httpx` (CRUD, upload, errori, conflitti) + avvio/stop `ServerRuntime` reale
 
 ### M3 — Renderer e player (2 giornate)
 
