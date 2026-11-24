@@ -15,6 +15,7 @@ from PyQt6.QtWidgets import (
     QLabel,
     QMainWindow,
     QMessageBox,
+    QScrollArea,
     QSizePolicy,
     QSplitter,
     QStackedWidget,
@@ -28,11 +29,15 @@ from ..core.commands import add_element, delete_element, update_element
 from ..core.history import Command, History
 from ..core.ids import new_id
 from ..core.models import Project, Slide
+from ..core.templates import TEMPLATES, build_slide, element_defaults
+from ..core.themes import THEMES, apply_to_project, get_theme
 from ..pdf.importer import build_slides
 from ..server.runtime import ServerRuntime
 from .canvas import CanvasView
 from .display import DisplayManager
 from .i18n import Translator
+from .inspector_panel import InspectorPanel
+from .palette import PalettePanel
 from .pdf_dialog import PdfImportDialog
 from .presenter_panel import PresenterPanel
 from .projects_panel import ProjectsPanel
@@ -162,6 +167,18 @@ class MainWindow(QMainWindow):
         self.zoom_fit_action.setShortcut(QKeySequence("Ctrl+0"))
         self.zoom_fit_action.triggered.connect(lambda: self._set_zoom(1.0))
 
+        self.theme_group = QActionGroup(self)
+        self.theme_group.setExclusive(True)
+        self.theme_actions: dict[str, QAction] = {}
+        for theme in THEMES:
+            action = QAction(self)
+            action.setCheckable(True)
+            action.triggered.connect(
+                lambda _checked=False, theme_id=theme.id: self.apply_theme(theme_id)
+            )
+            self.theme_group.addAction(action)
+            self.theme_actions[theme.id] = action
+
         self.start_action = QAction(self)
         self.start_action.setShortcut(QKeySequence("F5"))
         self.start_action.triggered.connect(self.start_presentation)
@@ -211,6 +228,8 @@ class MainWindow(QMainWindow):
         self.projects_panel = ProjectsPanel(self.store, self.translator)
         self.slides_panel = SlidesPanel(self.translator)
         self.presenter_panel = PresenterPanel(self.translator)
+        self.inspector_panel = InspectorPanel(self.translator)
+        self.palette_panel = PalettePanel(self.translator)
 
         left = QSplitter(Qt.Orientation.Vertical)
         left.addWidget(self.projects_panel)
@@ -227,16 +246,32 @@ class MainWindow(QMainWindow):
         self.left_dock.setMinimumWidth(250)
 
         self.right_dock = QDockWidget(self)
-        self.right_dock.setObjectName("presenterDock")
-        self.right_dock.setWidget(self.presenter_panel)
+        self.right_dock.setObjectName("inspectorDock")
+        self.right_dock.setWidget(self.inspector_panel)
         self.right_dock.setAllowedAreas(
             Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea
         )
-        self.right_dock.setMinimumWidth(280)
+        self.right_dock.setMinimumWidth(300)
+
+        presenter_scroll = QScrollArea()
+        presenter_scroll.setWidgetResizable(True)
+        presenter_scroll.setFrameShape(QScrollArea.Shape.NoFrame)
+        presenter_scroll.setWidget(self.presenter_panel)
+        self.bottom_dock = QDockWidget(self)
+        self.bottom_dock.setObjectName("presenterDock")
+        self.bottom_dock.setWidget(presenter_scroll)
+        self.bottom_dock.setAllowedAreas(
+            Qt.DockWidgetArea.BottomDockWidgetArea
+            | Qt.DockWidgetArea.LeftDockWidgetArea
+            | Qt.DockWidgetArea.RightDockWidgetArea
+        )
+        self.bottom_dock.setMinimumHeight(200)
 
         central = QWidget(self)
         central_layout = QVBoxLayout(central)
         central_layout.setContentsMargins(0, 0, 0, 0)
+        central_layout.setSpacing(0)
+        central_layout.addWidget(self.palette_panel)
         self.canvas_hint = QLabel()
         self.canvas_hint.setObjectName("canvasHint")
         self.canvas_hint.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -248,6 +283,7 @@ class MainWindow(QMainWindow):
 
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.left_dock)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.right_dock)
+        self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, self.bottom_dock)
 
         self.projects_panel.project_selected.connect(self.open_project)
         self.projects_panel.project_deleted.connect(self._on_project_deleted)
@@ -266,6 +302,10 @@ class MainWindow(QMainWindow):
         self.presenter_panel.black_toggled.connect(self._set_black)
         self.presenter_panel.display_requested.connect(self.open_on_display)
         self.presenter_panel.browser_requested.connect(self.open_in_browser)
+        self.inspector_panel.element_changed.connect(self._on_inspector_change)
+        self.inspector_panel.image_requested.connect(self._pick_image)
+        self.inspector_panel.preview_requested.connect(self._preview_animation)
+        self.palette_panel.element_requested.connect(self._add_element)
 
     def _build_menus(self) -> None:
         self.file_menu = self.menuBar().addMenu("")
@@ -290,6 +330,28 @@ class MainWindow(QMainWindow):
         self.view_menu.addAction(self.zoom_in_action)
         self.view_menu.addAction(self.zoom_out_action)
         self.view_menu.addAction(self.zoom_fit_action)
+
+        self.slide_menu = self.menuBar().addMenu("")
+        self.new_slide_action = self.slide_menu.addAction("")
+        self.new_slide_action.triggered.connect(self.add_html_slide)
+        self.pdf_slide_action = self.slide_menu.addAction("")
+        self.pdf_slide_action.triggered.connect(self.import_pdf)
+        self.template_menu = self.slide_menu.addMenu("")
+        self.template_actions: list[QAction] = []
+        for template in TEMPLATES:
+            action = QAction(self)
+            action.triggered.connect(
+                lambda _checked=False, template_id=template.id: self.add_template_slide(
+                    template_id
+                )
+            )
+            action.setData(template.name_key)
+            self.template_menu.addAction(action)
+            self.template_actions.append(action)
+
+        self.theme_menu = self.menuBar().addMenu("")
+        for theme in THEMES:
+            self.theme_menu.addAction(self.theme_actions[theme.id])
 
         self.presentation_menu = self.menuBar().addMenu("")
         self.presentation_menu.addAction(self.start_action)
@@ -362,6 +424,15 @@ class MainWindow(QMainWindow):
         self.zoom_in_action.setText(t("menu.view.zoom_in"))
         self.zoom_out_action.setText(t("menu.view.zoom_out"))
         self.zoom_fit_action.setText(t("menu.view.zoom_fit"))
+        self.slide_menu.setTitle(t("menu.slide"))
+        self.new_slide_action.setText(t("menu.slide.new"))
+        self.pdf_slide_action.setText(t("menu.slide.pdf"))
+        self.template_menu.setTitle(t("menu.slide.templates"))
+        for action in self.template_actions:
+            action.setText(t(str(action.data())))
+        self.theme_menu.setTitle(t("menu.theme"))
+        for theme in THEMES:
+            self.theme_actions[theme.id].setText(t(theme.name_key))
         self.start_action.setText(t("menu.presentation.start"))
         self.stop_action.setText(t("menu.presentation.stop"))
         self.next_action.setText(t("menu.presentation.next"))
@@ -373,7 +444,8 @@ class MainWindow(QMainWindow):
         self.lang_en.setText(t("menu.language.en"))
         self.about_action.setText(t("menu.help.about"))
         self.left_dock.setWindowTitle(t("dock.projects"))
-        self.right_dock.setWindowTitle(t("dock.presenter"))
+        self.right_dock.setWindowTitle(t("dock.inspector"))
+        self.bottom_dock.setWindowTitle(t("dock.presenter"))
         self.canvas_hint.setText(
             t("canvas.project", name=self.project.name)
             if self.project
@@ -381,6 +453,7 @@ class MainWindow(QMainWindow):
         )
         self.lang_it.setChecked(self.translator.language == "it")
         self.lang_en.setChecked(self.translator.language == "en")
+        self._sync_theme_actions()
         self._update_window_title()
         self._refresh_statusbar()
         if self.canvas is not None:
@@ -443,6 +516,7 @@ class MainWindow(QMainWindow):
         self.history.clear()
         self._selection = []
         self._update_history_actions()
+        self._sync_theme_actions()
         self.settings = self.settings.model_copy(update={"last_project_id": project.id})
         self._save_settings()
         self.retranslate()
@@ -460,6 +534,8 @@ class MainWindow(QMainWindow):
             self.history.clear()
             self._selection = []
             self._update_history_actions()
+            self.inspector_panel.set_selection([])
+            self._sync_theme_actions()
             self.canvas_stack.setCurrentWidget(self.canvas_hint)
             self.retranslate()
         if self.settings.last_project_id == project_id:
@@ -528,6 +604,7 @@ class MainWindow(QMainWindow):
         index = max(0, min(index, len(self.project.slides) - 1))
         self._selection = []
         self._update_history_actions()
+        self._refresh_inspector()
         canvas = self._ensure_canvas()
         if canvas is None:
             return
@@ -585,6 +662,7 @@ class MainWindow(QMainWindow):
             ids = data.get("ids")
             self._selection = [str(item) for item in ids] if isinstance(ids, list) else []
             self._update_history_actions()
+            self._refresh_inspector()
             return
         if action == "zoom.change":
             self._zoom = max(0.25, min(float(data.get("zoom") or 1.0), 2.0))
@@ -678,7 +756,7 @@ class MainWindow(QMainWindow):
         if commands:
             self._apply(commands)
 
-    def _apply(self, commands: list[Command]) -> None:
+    def _apply(self, commands: list[Command], *, refresh_inspector: bool = True) -> None:
         if self.project is None:
             return
         try:
@@ -690,6 +768,8 @@ class MainWindow(QMainWindow):
             return
         self._update_history_actions()
         self._refresh_canvas()
+        if refresh_inspector:
+            self._refresh_inspector()
         self._schedule_save()
 
     def _undo(self) -> None:
@@ -699,6 +779,7 @@ class MainWindow(QMainWindow):
         self._selection = []
         self._update_history_actions()
         self._refresh_canvas()
+        self._refresh_inspector()
         self._schedule_save()
 
     def _redo(self) -> None:
@@ -708,6 +789,7 @@ class MainWindow(QMainWindow):
         self._selection = []
         self._update_history_actions()
         self._refresh_canvas()
+        self._refresh_inspector()
         self._schedule_save()
 
     def _duplicate_selection(self) -> None:
@@ -729,6 +811,131 @@ class MainWindow(QMainWindow):
         has_selection = has_project and bool(self._selection)
         self.duplicate_element_action.setEnabled(has_selection)
         self.delete_element_action.setEnabled(has_selection)
+
+    # -- inspector, palette, temi ------------------------------------------
+
+    def _current_slide(self) -> Slide | None:
+        if self.project is None:
+            return None
+        index = max(
+            0, min(self.slides_panel.current_index(), len(self.project.slides) - 1)
+        )
+        return self.project.slides[index]
+
+    def _refresh_inspector(self) -> None:
+        slide = self._current_slide()
+        if slide is None:
+            self.inspector_panel.set_selection([])
+            return
+        by_id = {element.id: element for element in slide.elements}
+        self.inspector_panel.set_selection(
+            [by_id[element_id] for element_id in self._selection if element_id in by_id]
+        )
+
+    def _on_inspector_change(
+        self, element_id: str, changes: dict, merge_key: str
+    ) -> None:
+        slide = self._current_slide()
+        if slide is None:
+            return
+        try:
+            slide.element(element_id)
+        except KeyError:
+            return
+        command = update_element(slide.id, element_id, changes, merge_key=merge_key)
+        self._apply([command], refresh_inspector=False)
+
+    def _pick_image(self, element_id: str) -> None:
+        slide = self._current_slide()
+        if slide is None:
+            return
+        try:
+            element = slide.element(element_id)
+        except KeyError:
+            return
+        path, _ = QFileDialog.getOpenFileName(
+            self,
+            self.translator.t("inspector.image.choose"),
+            "",
+            self.translator.t("inspector.image.filter"),
+        )
+        if not path:
+            return
+        try:
+            meta = self.assets.save_bytes(Path(path).read_bytes(), Path(path).name)
+        except Exception as exc:
+            QMessageBox.warning(self, self.translator.t("dialog.error"), str(exc))
+            return
+        content = element.content.model_dump()
+        content["asset_id"] = meta.id
+        content["src"] = None
+        if not content.get("alt"):
+            content["alt"] = meta.original_name
+        command = update_element(
+            slide.id,
+            element_id,
+            {"content": content},
+            merge_key=f"inspector:{element_id}:content.image",
+        )
+        self._apply([command])
+
+    def _preview_animation(self, element_id: str) -> None:
+        slide = self._current_slide()
+        if slide is None or self.canvas is None:
+            return
+        try:
+            element = slide.element(element_id)
+        except KeyError:
+            return
+        self.canvas.patch_element(element)
+        self.canvas.send({"type": "play_animation", "id": element_id})
+
+    def _add_element(self, kind: str) -> None:
+        slide = self._current_slide()
+        if self.project is None or slide is None:
+            return
+        theme = get_theme(self.project.theme)
+        try:
+            element = element_defaults(kind, self.project.canvas, theme=theme)  # type: ignore[arg-type]
+        except ValueError:
+            return
+        self._selection = [element.id]
+        self._apply([add_element(slide.id, element)])
+
+    def add_template_slide(self, template_id: str) -> None:
+        if not self._require_project():
+            return
+        assert self.project is not None
+        theme = get_theme(self.project.theme)
+        number = len(self.project.slides) + 1
+        slide = build_slide(
+            template_id,
+            self.project.canvas,
+            name=self.translator.t("template.slide_name", n=number),
+            theme=theme,
+        )
+        self.project.slides.append(slide)
+        self._save_project()
+        self.slides_panel.set_slides(self.project, select=len(self.project.slides) - 1)
+        self._show_slide(len(self.project.slides) - 1)
+
+    def apply_theme(self, theme_id: str) -> None:
+        if self.project is None:
+            return
+        apply_to_project(self.project, theme_id)
+        self._save_project()
+        self._sync_theme_actions()
+        self._refresh_canvas()
+        self._refresh_inspector()
+        self.statusBar().showMessage(
+            self.translator.t("theme.applied", name=self.translator.t(f"theme.{theme_id}")),
+            2000,
+        )
+
+    def _sync_theme_actions(self) -> None:
+        current = self.project.theme if self.project else "dark"
+        for theme_id, action in self.theme_actions.items():
+            action.setChecked(theme_id == current)
 
     # -- slide ------------------------------------------------------------
 

@@ -858,14 +858,14 @@ Legenda: `[ ]` da fare · `[~]` in corso · `[x]` fatto
 
 ### M8 — Inspector, contenuti, template (3 giornate)
 
-- [ ] Inspector posizione/dimensioni/rotazione/opacità/z
-- [ ] Stile testo: font, size, weight, line-height, spacing, colore, allineamento
-- [ ] Stile box: background, padding, bordo, radius, ombra
-- [ ] Contenuti: testo, link, immagine (upload/sostituisci/crop semplice), pulsante, box, linea
-- [ ] Animazioni di ingresso + anteprima nel canvas
-- [ ] 5 template di slide (titolo, titolo+sottotitolo, elenco, immagine full, due colonne)
-- [ ] Temi colore (3–4) applicabili al progetto
-- [ ] Gestione font di sistema + eventuale font bundle
+- [x] Inspector posizione/dimensioni/rotazione/opacità/z
+- [x] Stile testo: font, size, weight, line-height, spacing, colore, allineamento
+- [x] Stile box: background, padding, bordo, radius, ombra
+- [x] Contenuti: testo, link, immagine (upload/sostituisci), pulsante, box, linea
+- [x] Animazioni di ingresso + anteprima nel canvas
+- [x] 5 template di slide (titolo, titolo+sottotitolo, elenco, immagine full, due colonne)
+- [x] Temi colore (3–4) applicabili al progetto
+- [x] Gestione font di sistema (`QFontComboBox`)
 
 ### M9 — Export e import (2 giornate)
 

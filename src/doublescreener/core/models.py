@@ -176,6 +176,7 @@ class Project(Model):
     updated_at: datetime = Field(default_factory=utcnow)
     canvas: Canvas = Field(default_factory=Canvas)
     default_transition: Transition = Field(default_factory=Transition)
+    theme: str = "dark"
     slides: list[Slide] = Field(default_factory=_default_slides)
 
     @field_validator("name")

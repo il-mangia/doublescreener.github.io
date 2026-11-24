@@ -115,6 +115,9 @@
       case "grid":
         setGrid(Boolean(message.on));
         break;
+      case "play_animation":
+        playAnimation(message.id);
+        break;
       case "lang":
         state.lang = message.lang || state.lang;
         document.documentElement.lang = state.lang;
@@ -167,6 +170,32 @@
   function setGrid(on) {
     state.grid = on;
     els.grid.hidden = !on;
+  }
+
+  const ANIMATIONS = {
+    fadeIn: "ds-fadeIn",
+    slideUp: "ds-slideUp",
+    slideDown: "ds-slideDown",
+    slideLeft: "ds-slideLeft",
+    slideRight: "ds-slideRight",
+    zoomIn: "ds-zoomIn",
+    bounce: "ds-bounce",
+  };
+
+  function playAnimation(elementId) {
+    const element = byId(elementId);
+    const node = nodeOf(elementId);
+    if (!element || !node) return;
+    const animation = element.animation || {};
+    const name = ANIMATIONS[animation.enter];
+    if (!name) return;
+    node.style.animation = "none";
+    void node.offsetWidth;
+    node.style.animationName = name;
+    node.style.animationDuration = `${Number(animation.duration_ms) || 0}ms`;
+    node.style.animationDelay = `${Number(animation.delay_ms) || 0}ms`;
+    node.style.animationTimingFunction = animation.easing || "ease-out";
+    node.style.animationFillMode = "both";
   }
 
   function fit() {

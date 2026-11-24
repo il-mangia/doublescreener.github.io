@@ -141,6 +141,26 @@ def test_main_window_smoke(qapp, tmp_path) -> None:
         window.reorder_slides([ids[1], ids[0]])
         assert [slide.id for slide in window.project.slides] == [ids[1], ids[0]]
 
+        # Palette, inspector, template e temi (M8).
+        window.palette_panel._buttons["text"].click()
+        current_slide = window._current_slide()
+        assert current_slide is not None
+        created_id = window._selection[0]
+        assert any(el.id == created_id for el in current_slide.elements)
+        window._refresh_inspector()
+        assert window.inspector_panel._element is not None
+        assert window.inspector_panel._element.id == created_id
+
+        window.inspector_panel.size_spin.setValue(64.0)
+        assert current_slide.element(created_id).style.font_size == 64.0
+
+        slide_count_before = len(window.project.slides)
+        window.add_template_slide("two_columns")
+        assert len(window.project.slides) == slide_count_before + 1
+
+        window.apply_theme("ocean")
+        assert window.project.theme == "ocean"
+
         window.stop_presentation()
         assert controller.snapshot().project_id is None
         window.close()
