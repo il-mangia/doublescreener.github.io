@@ -4,10 +4,12 @@ from __future__ import annotations
 
 from typing import Annotated, Any
 
-from fastapi import APIRouter, File, Request, UploadFile
+from fastapi import APIRouter, File, Query, Request, UploadFile
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse
 
 from ..core.errors import AssetError
+from ..pdf.renderer import clamp_width
 from .routes_projects import state_of
 
 router = APIRouter(prefix="/api", tags=["assets"])
@@ -66,3 +68,25 @@ async def get_asset(asset_id: str, request: Request) -> FileResponse:
             "default-src 'none'; style-src 'unsafe-inline'; img-src data:"
         )
     return FileResponse(path, media_type=meta.mime, headers=headers)
+
+
+@router.get("/assets/{asset_id}/pages/{page}")
+async def get_pdf_page(
+    asset_id: str,
+    page: int,
+    request: Request,
+    width: int | None = Query(default=None, ge=1),
+) -> FileResponse:
+    """Renderizza (o serve dalla cache) una pagina PDF come immagine WebP."""
+    state = state_of(request)
+    meta = state.assets.meta(asset_id)
+    if meta.kind != "pdf":
+        raise AssetError(f"l'asset {asset_id} non è un PDF")
+    target_width = clamp_width(width or state.settings.pdf_render_width)
+    path = await run_in_threadpool(state.pdf.render, asset_id, page, target_width)
+    headers = {
+        "Cache-Control": "public, max-age=31536000, immutable",
+        "X-Content-Type-Options": "nosniff",
+        "ETag": f'"{asset_id}-p{page}-w{target_width}"',
+    }
+    return FileResponse(path, media_type="image/webp", headers=headers)

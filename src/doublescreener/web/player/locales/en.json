@@ -10,5 +10,6 @@
   "reload": "Reload",
   "status.black": "Black screen",
   "status.connecting": "Connecting…",
+  "status.rendering": "Rendering…",
   "status.reconnecting": "Reconnecting…"
 }

@@ -16,6 +16,7 @@ from ..config import DEFAULT_PORT, Paths, Settings, SettingsManager
 from ..core.assets import AssetStore
 from ..core.presentation import PresentationController
 from ..core.store import ProjectStore
+from ..pdf.renderer import PdfRenderer
 from . import routes_assets, routes_presentation, routes_projects, ws
 from .errors import install_error_handlers
 from .net import lan_ip
@@ -47,6 +48,7 @@ def create_app(
     manager = SettingsManager(paths)
     settings = settings or manager.load()
     project_store = store or ProjectStore(paths)
+    asset_store = assets or AssetStore(paths)
     controller = PresentationController(
         project_store, lang=settings.lang, pdf_width=settings.pdf_render_width
     )
@@ -66,9 +68,10 @@ def create_app(
         settings=settings,
         settings_manager=manager,
         store=project_store,
-        assets=assets or AssetStore(paths),
+        assets=asset_store,
         controller=controller,
         hub=WebSocketHub(controller),
+        pdf=PdfRenderer(paths, asset_store),
         port=port,
         lan_ip=lan_ip(),
     )

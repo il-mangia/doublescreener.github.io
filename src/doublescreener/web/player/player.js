@@ -32,6 +32,8 @@
   let attempts = 0;
   let reconnectTimer = null;
   let hideControlsTimer = null;
+  let renderToken = 0;
+  const pdfCache = new Set();
 
   const clientId = (() => {
     try {
@@ -144,10 +146,44 @@
     ui.wrap.classList.add(`ds-transition-${type}`);
   }
 
-  function showSlide(message) {
+  function preloadImage(url, timeoutMs) {
+    return new Promise((resolve) => {
+      if (!url) {
+        resolve(false);
+        return;
+      }
+      const image = new Image();
+      let settled = false;
+      const finish = (ok) => {
+        if (settled) return;
+        settled = true;
+        image.onload = null;
+        image.onerror = null;
+        resolve(ok);
+      };
+      image.onload = () => finish(true);
+      image.onerror = () => finish(false);
+      image.src = url;
+      window.setTimeout(() => finish(false), timeoutMs || 8000);
+    });
+  }
+
+  async function showSlide(message) {
     if (!message || !message.slide) return;
     const slide = message.slide;
     const index = typeof message.index === "number" ? message.index : slide.index || 0;
+    const token = ++renderToken;
+    const pdfUrl =
+      slide.kind === "pdf_page" && slide.pdf ? slide.pdf.image_url : null;
+
+    if (pdfUrl && !pdfCache.has(pdfUrl)) {
+      if (session && session.slide) setStatus(t("status.rendering", "Rendering…"));
+      const loaded = await preloadImage(pdfUrl);
+      if (token !== renderToken) return;
+      if (loaded) pdfCache.add(pdfUrl);
+    }
+    if (token !== renderToken) return;
+
     session = session
       ? { ...session, canvas: slide.canvas, slide, index }
       : { canvas: slide.canvas, slide, index, state: {} };

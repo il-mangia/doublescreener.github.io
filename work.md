@@ -791,7 +791,7 @@ Legenda: `[ ]` da fare · `[~]` in corso · `[x]` fatto
 - [x] `assets.py`: upload, hash SHA-256 per dedupe, probing dimensioni
 - [x] `history.py`: comandi, undo/redo, coalescing, limite
 - [x] `migrate(data)` con `schema_version`
-- [x] Test: `test_models.py`, `test_store.py`, `test_history.py` (suite completa: 93 test, tutti verdi)
+- [x] Test: `test_models.py`, `test_store.py`, `test_history.py` (suite completa verde)
 
 ### M2 — API (1 giornata)
 
@@ -821,12 +821,12 @@ Legenda: `[ ]` da fare · `[~]` in corso · `[x]` fatto
 
 ### M5 — PDF (2 giornate)
 
-- [ ] `pdf/importer.py`: apertura, pagine, metadati, errori
-- [ ] `pdf/renderer.py`: render con PyMuPDF, cache WebP, thread pool
-- [ ] Endpoint pagina + invalidazione cache
-- [ ] `PdfImportDialog`: range, larghezza, anteprima, "una slide per pagina"
-- [ ] `pdf_mode` nel player: immagine, preload, transizione
-- [ ] Test `test_pdf.py` (conteggio, range, cache hit/miss, file corrotto)
+- [x] `pdf/importer.py`: apertura, pagine, metadati, errori
+- [x] `pdf/renderer.py`: render con PyMuPDF, cache WebP, thread pool
+- [x] Endpoint pagina + invalidazione cache
+- [ ] `PdfImportDialog`: range, larghezza, anteprima, "una slide per pagina" (in M6)
+- [x] `pdf_mode` nel player: immagine, preload, transizione
+- [x] Test `test_pdf.py` (conteggio, range, cache hit/miss, file corrotto)
 
 ### M6 — Regia PyQt6: shell (2–3 giornate)
 

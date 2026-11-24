@@ -11,6 +11,7 @@ from ..core.store import ProjectStore
 
 if TYPE_CHECKING:
     from ..core.presentation import PresentationController
+    from ..pdf.renderer import PdfRenderer
     from .ws import WebSocketHub
 
 
@@ -23,5 +24,6 @@ class AppState:
     assets: AssetStore
     controller: PresentationController
     hub: WebSocketHub
+    pdf: PdfRenderer
     port: int
     lan_ip: str

@@ -10,5 +10,6 @@
   "reload": "Ricarica",
   "status.black": "Schermo nero",
   "status.connecting": "Connessione…",
+  "status.rendering": "Rendering…",
   "status.reconnecting": "Riconnessione…"
 }
