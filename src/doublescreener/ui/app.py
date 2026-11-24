@@ -16,7 +16,7 @@ from ..server.runtime import ServerRuntime
 # Bootstrap di QtWebEngine: deve avvenire prima di creare QApplication.
 from . import webengine  # noqa: F401
 from .main_window import MainWindow
-from .theme import DARK_QSS
+from .theme import stylesheet_for
 
 log = logging.getLogger(__name__)
 
@@ -65,10 +65,9 @@ def run_gui(
     app.setOrganizationName("il-mangia")
     app.setOrganizationDomain("doublescreener.github.io")
     app.setStyle("Fusion")
-    app.setStyleSheet(DARK_QSS)
-
     settings_manager = SettingsManager(paths)
     settings = settings_manager.load()
+    app.setStyleSheet(stylesheet_for(settings.theme))
     effective_port = port
     if port == DEFAULT_PORT and settings.port != DEFAULT_PORT:
         effective_port = settings.port

@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import contextlib
 import logging
+import platform
+import sys
 from pathlib import Path
 
 from PyQt6.QtCore import QObject, QSettings, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction, QActionGroup, QCloseEvent, QKeySequence
 from PyQt6.QtWidgets import (
+    QApplication,
     QDockWidget,
     QFileDialog,
     QInputDialog,
@@ -45,6 +48,7 @@ from .presenter_panel import PresenterPanel
 from .projects_panel import ProjectsPanel
 from .settings_dialog import SettingsDialog
 from .slides_panel import SlidesPanel
+from .theme import stylesheet_for
 
 log = logging.getLogger(__name__)
 
@@ -230,6 +234,9 @@ class MainWindow(QMainWindow):
         self.about_action = QAction(self)
         self.about_action.triggered.connect(self.show_about)
 
+        self.copy_info_action = QAction(self)
+        self.copy_info_action.triggered.connect(self.copy_system_info)
+
     def _build_ui(self) -> None:
         self.setMinimumSize(960, 640)
         self.resize(1320, 820)
@@ -381,6 +388,8 @@ class MainWindow(QMainWindow):
         self.language_menu.addAction(self.lang_en)
 
         self.help_menu = self.menuBar().addMenu("")
+        self.help_menu.addAction(self.copy_info_action)
+        self.help_menu.addSeparator()
         self.help_menu.addAction(self.about_action)
 
     def _build_toolbar(self) -> None:
@@ -456,6 +465,7 @@ class MainWindow(QMainWindow):
         self.browser_action.setText(t("menu.presentation.browser"))
         self.lang_it.setText(t("menu.language.it"))
         self.lang_en.setText(t("menu.language.en"))
+        self.copy_info_action.setText(t("menu.help.copy_info"))
         self.about_action.setText(t("menu.help.about"))
         self.left_dock.setWindowTitle(t("dock.projects"))
         self.right_dock.setWindowTitle(t("dock.inspector"))
@@ -1283,6 +1293,10 @@ class MainWindow(QMainWindow):
         self.controller.set_lang(self.settings.lang)
         self.controller.set_pdf_width(self.settings.pdf_render_width)
         self.translator.set_language(self.settings.lang)
+        if old.theme != self.settings.theme:
+            app = QApplication.instance()
+            if isinstance(app, QApplication):
+                app.setStyleSheet(stylesheet_for(self.settings.theme))
         if old.pdf_render_width != self.settings.pdf_render_width:
             self._refresh_canvas()
         if (old.port, old.bind) != (self.settings.port, self.settings.bind):
@@ -1291,6 +1305,22 @@ class MainWindow(QMainWindow):
                 self.translator.t("settings.title"),
                 self.translator.t("settings.restart_hint"),
             )
+
+    def copy_system_info(self) -> None:
+        info = "\n".join(
+            [
+                f"DoubleScreener {__version__}",
+                f"Python: {sys.version.split()[0]}",
+                f"OS: {platform.platform()}",
+                f"Data dir: {self.paths.root}",
+                f"Server: {self._player_url()} (running={self.runtime.running})",
+                f"Clients: {self.hub.client_count}",
+            ]
+        )
+        clipboard = QApplication.clipboard()
+        if clipboard is not None:
+            clipboard.setText(info)
+        self.statusBar().showMessage(self.translator.t("help.copy_info.done"), 2500)
 
     def show_about(self) -> None:
         QMessageBox.about(

@@ -878,15 +878,15 @@ Legenda: `[ ]` da fare · `[~]` in corso · `[x]` fatto
 
 ### M10 — i18n, rifiniture, QA (2–3 giornate)
 
-- [ ] Locale Qt IT/EN complete
-- [ ] Locale web IT/EN complete (player + canvas)
-- [ ] `test_i18n.py` parità chiavi
-- [ ] Tema scuro (default) + chiaro
-- [ ] Stati vuoti e messaggi di errore utili
-- [ ] Accessibilità base: contrasto, focus, tooltip, navigazione tastiera
-- [ ] Diagnostica: pannello log, "copia info sistema"
-- [ ] `docs/architecture.md`, `api.md`, `ws-protocol.md`, `setup.md`
-- [ ] README bilingue + quick start
+- [x] Locale Qt IT/EN complete
+- [x] Locale web IT/EN complete (player + canvas)
+- [x] `test_i18n.py` parità chiavi
+- [x] Tema scuro (default) + chiaro
+- [x] Stati vuoti e messaggi di errore utili
+- [x] Accessibilità base: contrasto, focus, tooltip, navigazione tastiera
+- [x] Diagnostica: "copia info sistema"
+- [x] `docs/architecture.md`, `api.md`, `ws-protocol.md`, `setup.md`
+- [x] README bilingue + quick start
 - [ ] Landing GitHub Pages aggiornata (hero, feature, setup, IT/EN)
 - [ ] QA matrix: Windows 10/11, Chrome/Edge/Firefox, Smart TV, tablet
 - [ ] Tag `v2.0.0` e note di rilascio
