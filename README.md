@@ -15,6 +15,22 @@ But you can also use DoubleScreener local by:
 4. Drag elements into the canvas, style them, and press Apply Changes.
 5. Open front-end.html to see the live result!
 
+### DoubleScreener v2 (in sviluppo)
+
+La v2 è una regia desktop **PyQt6** con backend Python (FastAPI + Uvicorn) e second screen web. Il codice vive in `src/doublescreener/` sul branch `v2-rewrite`; la demo statica qui sopra resta disponibile su GitHub Pages.
+
+```bash
+python -m venv .venv
+# Windows: .venv\Scripts\activate
+# Linux/macOS: source .venv/bin/activate
+pip install -e ".[gui,dev]"
+
+python -m doublescreener              # regia desktop
+python -m doublescreener --headless   # solo backend, senza GUI
+```
+
+Con la regia aperta, punta TV, tablet o secondo PC all'indirizzo LAN mostrato nel pannello Presentazione (o inquadra il QR). I dati stanno nella cartella utente dell'app; usa `--data-dir PATH` per cambiarli.
+
 ---
 
 ## Features

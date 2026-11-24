@@ -780,7 +780,7 @@ Legenda: `[ ]` da fare · `[~]` in corso · `[x]` fatto
 - [x] Struttura cartelle `src/doublescreener/**` con `__init__.py` minimi (`core`, `server`, `web`, `ui`)
 - [x] `config.py` + `logging_setup.py` + CLI (`--data-dir`, `--port`, `--debug`)
 - [x] `python -m doublescreener --help` funzionante
-- [ ] Smoke test: QApplication vuota che si apre e si chiude (richiede extra `gui`, in M6)
+- [x] Smoke test: `QApplication` vuota che si apre e si chiude (extra `gui` installato)
 
 ### M1 — Core e persistenza (1–2 giornate)
 
@@ -824,21 +824,21 @@ Legenda: `[ ]` da fare · `[~]` in corso · `[x]` fatto
 - [x] `pdf/importer.py`: apertura, pagine, metadati, errori
 - [x] `pdf/renderer.py`: render con PyMuPDF, cache WebP, thread pool
 - [x] Endpoint pagina + invalidazione cache
-- [ ] `PdfImportDialog`: range, larghezza, anteprima, "una slide per pagina" (in M6)
+- [x] `PdfImportDialog`: range, larghezza, anteprima, "una slide per pagina"
 - [x] `pdf_mode` nel player: immagine, preload, transizione
 - [x] Test `test_pdf.py` (conteggio, range, cache hit/miss, file corrotto)
 
 ### M6 — Regia PyQt6: shell (2–3 giornate)
 
-- [ ] `MainWindow`: layout, dock, toolbar, status bar
-- [ ] `ServerRuntime`: avvio/stop Uvicorn, porta occupata, shutdown pulito
-- [ ] Istanza singola (`QLocalServer`) e ripristino finestra
-- [ ] `ProjectsPanel`: lista, nuovo, apri, rinomina, duplica, elimina
-- [ ] `SlidesPanel`: lista, miniature, riordino, aggiungi/duplica/elimina
-- [ ] `PresenterPanel`: stato, client connessi, URL+QR, black, note
-- [ ] `DisplayManager`: apertura player fullscreen su `QScreen` scelto
-- [ ] `SettingsDialog`: lingua, porta, canvas, PDF, autosave, tema
-- [ ] Persistenza settings e ultimo progetto
+- [x] `MainWindow`: layout, dock, toolbar, status bar
+- [x] `ServerRuntime`: avvio/stop Uvicorn, porta occupata, shutdown pulito
+- [x] Istanza singola (`QLocalServer`) e ripristino finestra
+- [x] `ProjectsPanel`: lista, nuovo, apri, rinomina, duplica, elimina
+- [~] `SlidesPanel`: lista, riordino, aggiungi/duplica/elimina (miniature in M7)
+- [x] `PresenterPanel`: stato, client connessi, URL+QR, black, note
+- [x] `DisplayManager`: apertura player fullscreen su `QScreen` scelto
+- [x] `SettingsDialog`: lingua, porta, canvas, PDF, autosave, tema
+- [x] Persistenza settings e ultimo progetto
 
 ### M7 — Canvas (3–4 giornate)
 
@@ -853,6 +853,7 @@ Legenda: `[ ]` da fare · `[~]` in corso · `[x]` fatto
 - [ ] Editing testo inline (`contenteditable`, Esc/Invio)
 - [ ] Scorciatoie globali (frecce, Del, Ctrl+D/Z/Y/S)
 - [ ] Sincronizzazione bidirezionale robusta (intent rifiutati → riallineamento)
+- [ ] Miniature delle slide nel pannello (render headless o canvas)
 
 ### M8 — Inspector, contenuti, template (3 giornate)
 
