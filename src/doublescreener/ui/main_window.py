@@ -31,10 +31,12 @@ from ..core.ids import new_id
 from ..core.models import Project, Slide
 from ..core.templates import TEMPLATES, build_slide, element_defaults
 from ..core.themes import THEMES, apply_to_project, get_theme
+from ..export import export_single_file, export_static_site
 from ..pdf.importer import build_slides
 from ..server.runtime import ServerRuntime
 from .canvas import CanvasView
 from .display import DisplayManager
+from .export_dialog import ExportDialog
 from .i18n import Translator
 from .inspector_panel import InspectorPanel
 from .palette import PalettePanel
@@ -135,6 +137,13 @@ class MainWindow(QMainWindow):
         self.save_action = QAction(self)
         self.save_action.setShortcut(QKeySequence.StandardKey.Save)
         self.save_action.triggered.connect(self._save_project)
+
+        self.import_project_action = QAction(self)
+        self.import_project_action.triggered.connect(self.import_project_json)
+
+        self.export_action = QAction(self)
+        self.export_action.setShortcut(QKeySequence("Ctrl+E"))
+        self.export_action.triggered.connect(self.export_project)
 
         self.undo_action = QAction(self)
         self.undo_action.setShortcut(QKeySequence.StandardKey.Undo)
@@ -313,6 +322,9 @@ class MainWindow(QMainWindow):
         self.file_menu.addAction(self.open_action)
         self.file_menu.addAction(self.save_action)
         self.file_menu.addSeparator()
+        self.file_menu.addAction(self.import_project_action)
+        self.file_menu.addAction(self.export_action)
+        self.file_menu.addSeparator()
         self.file_menu.addAction(self.settings_action)
         self.file_menu.addSeparator()
         self.file_menu.addAction(self.quit_action)
@@ -414,6 +426,8 @@ class MainWindow(QMainWindow):
         self.new_action.setText(t("menu.file.new"))
         self.open_action.setText(t("menu.file.open"))
         self.save_action.setText(t("menu.file.save"))
+        self.import_project_action.setText(t("menu.file.import_json"))
+        self.export_action.setText(t("menu.file.export"))
         self.settings_action.setText(t("menu.file.settings"))
         self.quit_action.setText(t("menu.file.quit"))
         self.undo_action.setText(t("menu.edit.undo"))
@@ -495,6 +509,68 @@ class MainWindow(QMainWindow):
 
     def _new_project(self) -> None:
         self.projects_panel.create_project()
+
+    def import_project_json(self) -> None:
+        path, _ = QFileDialog.getOpenFileName(
+            self,
+            self.translator.t("import.json.title"),
+            "",
+            self.translator.t("import.json.filter"),
+        )
+        if not path:
+            return
+        try:
+            project = self.store.import_file(Path(path))
+        except Exception as exc:
+            QMessageBox.warning(self, self.translator.t("dialog.error"), str(exc))
+            return
+        self.projects_panel.refresh()
+        self.open_project(project.id)
+        self.statusBar().showMessage(
+            self.translator.t("import.json.done", name=project.name), 3000
+        )
+
+    def export_project(self) -> None:
+        if not self._require_project():
+            return
+        assert self.project is not None
+        self._save_project()
+        dialog = ExportDialog(
+            self.project,
+            self.assets,
+            self.pdf_renderer,
+            self.translator,
+            pdf_width=self.settings.pdf_render_width,
+            parent=self,
+        )
+        if dialog.exec() != dialog.DialogCode.Accepted:
+            return
+        target = dialog.target_path()
+        try:
+            if dialog.selected_format() == "single_file":
+                result = export_single_file(
+                    self.project,
+                    target,
+                    self.assets,
+                    self.pdf_renderer,
+                    pdf_width=self.settings.pdf_render_width,
+                )
+            else:
+                result = export_static_site(
+                    self.project,
+                    target,
+                    self.assets,
+                    self.pdf_renderer,
+                    pdf_width=self.settings.pdf_render_width,
+                )
+        except Exception as exc:
+            QMessageBox.warning(self, self.translator.t("dialog.error"), str(exc))
+            return
+        QMessageBox.information(
+            self,
+            self.translator.t("export.title"),
+            self.translator.t("export.done", path=str(result.output_path)),
+        )
 
     def open_project(self, project_id: str) -> None:
         try:

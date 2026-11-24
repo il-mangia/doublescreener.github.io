@@ -161,6 +161,21 @@ def test_main_window_smoke(qapp, tmp_path) -> None:
         window.apply_theme("ocean")
         assert window.project.theme == "ocean"
 
+        from doublescreener.ui.export_dialog import ExportDialog
+
+        export_dialog = ExportDialog(
+            window.project,
+            window.assets,
+            window.pdf_renderer,
+            window.translator,
+            default_dir=tmp_path,
+            parent=window,
+        )
+        assert export_dialog.selected_format() == "folder"
+        export_dialog.format_combo.setCurrentIndex(1)
+        assert export_dialog.selected_format() == "single_file"
+        assert export_dialog.target_path().suffix == ".html"
+
         window.stop_presentation()
         assert controller.snapshot().project_id is None
         window.close()

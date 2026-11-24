@@ -195,6 +195,22 @@ class ProjectStore:
         ]
         return self.save(copy)
 
+    def import_data(self, data: dict[str, Any], *, keep_id: bool = False) -> Project:
+        """Valida, migra e importa un progetto da dizionario JSON."""
+        migrated = migrate(data)
+        project = Project.model_validate(migrated)
+        if not keep_id or self.exists(project.id):
+            project = project.model_copy(deep=True)
+            project.id = new_id("project")
+            project.created_at = utcnow()
+            project.updated_at = utcnow()
+        return self.save(project)
+
+    def import_file(self, path: Path, *, keep_id: bool = False) -> Project:
+        """Valida, migra e importa un progetto da un file JSON."""
+        data = read_json(path)
+        return self.import_data(data, keep_id=keep_id)
+
     @staticmethod
     def _clone_slide(slide: Slide) -> Slide:
         clone = slide.model_copy(deep=True)

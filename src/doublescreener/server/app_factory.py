@@ -18,7 +18,7 @@ from ..core.errors import NotFoundError
 from ..core.presentation import PresentationController
 from ..core.store import ProjectStore
 from ..pdf.renderer import PdfRenderer
-from . import routes_assets, routes_presentation, routes_projects, ws
+from . import routes_assets, routes_export, routes_presentation, routes_projects, ws
 from .errors import install_error_handlers
 from .net import lan_ip
 from .qtwebchannel import qwebchannel_source
@@ -82,6 +82,7 @@ def create_app(
     app.include_router(routes_projects.router)
     app.include_router(routes_assets.router)
     app.include_router(routes_presentation.router)
+    app.include_router(routes_export.router)
     app.include_router(ws.router)
 
     shared = WEB_ROOT / "shared"

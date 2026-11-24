@@ -869,12 +869,12 @@ Legenda: `[ ]` da fare · `[~]` in corso · `[x]` fatto
 
 ### M9 — Export e import (2 giornate)
 
-- [ ] `static_site.py`: cartella con player standalone
-- [ ] `single_file.py`: HTML unico con asset inline
-- [ ] Navigazione standalone (tastiera, click, black) senza server
-- [ ] `ExportDialog`: formato, percorso, anteprima dimensioni
-- [ ] Import progetto JSON (validazione + migrazione)
-- [ ] Test `test_export.py`: snapshot rendering + apertura `file://`
+- [x] `static_site.py`: cartella con player standalone
+- [x] `single_file.py`: HTML unico con asset inline
+- [x] Navigazione standalone (tastiera, click, black) senza server
+- [x] `ExportDialog`: formato, percorso, anteprima dimensioni
+- [x] Import progetto JSON (validazione + migrazione)
+- [x] Test `test_export.py`: snapshot rendering + apertura `file://`
 
 ### M10 — i18n, rifiniture, QA (2–3 giornate)
 
