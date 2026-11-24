@@ -7,16 +7,19 @@ import os
 import pytest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+os.environ.setdefault("QTWEBENGINE_CHROMIUM_FLAGS", "--no-sandbox --disable-gpu")
 pytest.importorskip("PyQt6.QtWidgets")
 
-from PyQt6.QtCore import QSettings
-from PyQt6.QtWidgets import QApplication
+from PyQt6.QtCore import QSettings  # noqa: E402
+from PyQt6.QtWidgets import QApplication  # noqa: E402
 
-from doublescreener.config import Paths, Settings, SettingsManager
-from doublescreener.pdf.renderer import PdfRenderer
-from doublescreener.server.runtime import ServerRuntime
-from doublescreener.ui.i18n import LOCALES_DIR, Translator
-from doublescreener.ui.pdf_dialog import PdfImportDialog
+from doublescreener.config import Paths, Settings, SettingsManager  # noqa: E402
+from doublescreener.core.models import Element, ElementContent  # noqa: E402
+from doublescreener.pdf.renderer import PdfRenderer  # noqa: E402
+from doublescreener.server.runtime import ServerRuntime  # noqa: E402
+from doublescreener.ui import webengine  # noqa: E402, F401
+from doublescreener.ui.i18n import LOCALES_DIR, Translator  # noqa: E402
+from doublescreener.ui.pdf_dialog import PdfImportDialog  # noqa: E402
 
 
 @pytest.fixture(scope="module")
@@ -86,7 +89,13 @@ def test_main_window_smoke(qapp, tmp_path) -> None:
     runtime = ServerRuntime(paths, host="127.0.0.1", port=0)
     runtime.start()
     try:
-        window = MainWindow(paths, runtime, SettingsManager(paths), Settings(lang="it"))
+        window = MainWindow(
+            paths,
+            runtime,
+            SettingsManager(paths),
+            Settings(lang="it"),
+            enable_canvas=False,
+        )
         store = runtime.app.state.ds.store
         controller = runtime.app.state.ds.controller
 
@@ -98,6 +107,22 @@ def test_main_window_smoke(qapp, tmp_path) -> None:
         window.add_html_slide()
         assert window.project is not None
         assert len(window.project.slides) == 2
+
+        # Modifica di un elemento via intent del canvas, senza QtWebEngine.
+        element = Element(type="text", content=ElementContent(text="Ciao"))
+        window.project.slides[0].elements.append(element)
+        window.slides_panel.set_current_index(0)
+        window._on_canvas_intent(
+            {
+                "action": "element.update",
+                "payload": {"id": element.id, "changes": {"rect": {"x": 40, "y": 50}}},
+            }
+        )
+        assert window.project.slides[0].elements[0].rect.x == 40
+        assert window.history.can_undo
+
+        window._undo()
+        assert window.project.slides[0].elements[0].rect.x == 0
 
         window.slides_panel.set_current_index(0)
         window.start_presentation()

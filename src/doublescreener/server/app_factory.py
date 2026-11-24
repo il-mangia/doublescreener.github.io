@@ -8,18 +8,20 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import FileResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 from .. import __version__
 from ..config import DEFAULT_PORT, Paths, Settings, SettingsManager
 from ..core.assets import AssetStore
+from ..core.errors import NotFoundError
 from ..core.presentation import PresentationController
 from ..core.store import ProjectStore
 from ..pdf.renderer import PdfRenderer
 from . import routes_assets, routes_presentation, routes_projects, ws
 from .errors import install_error_handlers
 from .net import lan_ip
+from .qtwebchannel import qwebchannel_source
 from .state import AppState
 from .ws import WebSocketHub
 
@@ -84,10 +86,13 @@ def create_app(
 
     shared = WEB_ROOT / "shared"
     player = WEB_ROOT / "player"
+    canvas = WEB_ROOT / "canvas"
     if shared.is_dir():
         app.mount("/static/shared", StaticFiles(directory=shared), name="shared")
     if player.is_dir():
         app.mount("/static/player", StaticFiles(directory=player), name="player")
+    if canvas.is_dir():
+        app.mount("/static/canvas", StaticFiles(directory=canvas), name="canvas")
 
     @app.get("/p", include_in_schema=False)
     @app.get("/player", include_in_schema=False)
@@ -95,6 +100,26 @@ def create_app(
         return FileResponse(
             player / "index.html",
             media_type="text/html",
+            headers={"Cache-Control": "no-cache"},
+        )
+
+    @app.get("/editor-canvas", include_in_schema=False)
+    @app.get("/canvas", include_in_schema=False)
+    async def canvas_page() -> FileResponse:
+        return FileResponse(
+            canvas / "index.html",
+            media_type="text/html",
+            headers={"Cache-Control": "no-cache"},
+        )
+
+    @app.get("/qtwebchannel.js", include_in_schema=False)
+    async def qwebchannel_js() -> Response:
+        source = qwebchannel_source()
+        if source is None:
+            raise NotFoundError("qwebchannel.js non disponibile: installa l'extra gui")
+        return Response(
+            source,
+            media_type="application/javascript",
             headers={"Cache-Control": "no-cache"},
         )
 

@@ -9,15 +9,12 @@ import sys
 from PyQt6.QtNetwork import QLocalServer, QLocalSocket
 from PyQt6.QtWidgets import QApplication, QMessageBox
 
-# QtWebEngine va importato prima di creare QApplication.
-try:
-    from PyQt6 import QtWebEngineWidgets  # noqa: F401
-except ImportError:  # pragma: no cover - dipende dall'extra gui
-    QtWebEngineWidgets = None  # type: ignore[assignment]
-
 from .. import __version__
 from ..config import DEFAULT_BIND, DEFAULT_PORT, Paths, SettingsManager
 from ..server.runtime import ServerRuntime
+
+# Bootstrap di QtWebEngine: deve avvenire prima di creare QApplication.
+from . import webengine  # noqa: F401
 from .main_window import MainWindow
 from .theme import DARK_QSS
 

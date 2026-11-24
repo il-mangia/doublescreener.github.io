@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>DoubleScreener · Canvas</title>
+  <link rel="stylesheet" href="/static/shared/renderer.css">
+  <link rel="stylesheet" href="/static/shared/transitions.css">
+  <link rel="stylesheet" href="/static/canvas/canvas.css">
+</head>
+<body>
+  <div id="viewport" class="viewport">
+    <div id="holder" class="holder">
+      <div id="stage" class="stage"></div>
+      <div id="grid" class="grid" hidden></div>
+      <div id="overlay" class="overlay"></div>
+      <div id="guides" class="guides"></div>
+    </div>
+  </div>
+
+  <div id="banner" class="banner">Canvas in attesa della regia…</div>
+  <div id="hint" class="hint" hidden></div>
+
+  <script src="/qtwebchannel.js"></script>
+  <script src="/static/shared/renderer.js"></script>
+  <script src="/static/canvas/canvas.js"></script>
+</body>
+</html>

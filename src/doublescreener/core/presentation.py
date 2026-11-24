@@ -48,6 +48,40 @@ class PresentationSnapshot:
 Listener = Callable[[EventKind, PresentationSnapshot], None]
 
 
+def slide_payload(
+    project: Project,
+    slide: Slide,
+    index: int,
+    *,
+    pdf_width: int = 1920,
+) -> dict[str, Any]:
+    """Rappresentazione di una slide usata da player, canvas ed export."""
+    payload: dict[str, Any] = {
+        "index": index,
+        "id": slide.id,
+        "kind": slide.kind,
+        "name": slide.name,
+        "notes": slide.notes,
+        "background": slide.background or project.canvas.background,
+        "canvas": project.canvas.model_dump(mode="json"),
+        "transition": (slide.transition or project.default_transition).model_dump(mode="json"),
+        "elements": [element.model_dump(mode="json") for element in slide.elements],
+        "pdf": None,
+    }
+    if slide.kind == "pdf_page" and slide.pdf is not None:
+        payload["pdf"] = {
+            "asset_id": slide.pdf.asset_id,
+            "page": slide.pdf.page,
+            "source_name": slide.pdf.source_name,
+            "image_url": PDF_PAGE_URL.format(
+                asset_id=slide.pdf.asset_id,
+                page=slide.pdf.page,
+                width=pdf_width,
+            ),
+        }
+    return payload
+
+
 class PresentationController:
     def __init__(
         self,
@@ -193,31 +227,9 @@ class PresentationController:
 
     def _slide_payload_unlocked(self, index: int) -> dict[str, Any]:
         project = self._current_project_unlocked()
-        slide = project.slides[index]
-        payload: dict[str, Any] = {
-            "index": index,
-            "id": slide.id,
-            "kind": slide.kind,
-            "name": slide.name,
-            "notes": slide.notes,
-            "background": slide.background or project.canvas.background,
-            "canvas": project.canvas.model_dump(mode="json"),
-            "transition": (slide.transition or project.default_transition).model_dump(mode="json"),
-            "elements": [element.model_dump(mode="json") for element in slide.elements],
-            "pdf": None,
-        }
-        if slide.kind == "pdf_page" and slide.pdf is not None:
-            payload["pdf"] = {
-                "asset_id": slide.pdf.asset_id,
-                "page": slide.pdf.page,
-                "source_name": slide.pdf.source_name,
-                "image_url": PDF_PAGE_URL.format(
-                    asset_id=slide.pdf.asset_id,
-                    page=slide.pdf.page,
-                    width=self._pdf_width,
-                ),
-            }
-        return payload
+        return slide_payload(
+            project, project.slides[index], index, pdf_width=self._pdf_width
+        )
 
     def slide_payload(self, index: int | None = None) -> dict[str, Any] | None:
         with self._lock:

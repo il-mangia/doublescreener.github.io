@@ -17,16 +17,20 @@ from PyQt6.QtWidgets import (
     QMessageBox,
     QSizePolicy,
     QSplitter,
+    QStackedWidget,
     QVBoxLayout,
     QWidget,
 )
 
 from .. import __version__
 from ..config import Paths, Settings, SettingsManager
+from ..core.commands import add_element, delete_element, update_element
+from ..core.history import Command, History
 from ..core.ids import new_id
 from ..core.models import Project, Slide
 from ..pdf.importer import build_slides
 from ..server.runtime import ServerRuntime
+from .canvas import CanvasView
 from .display import DisplayManager
 from .i18n import Translator
 from .pdf_dialog import PdfImportDialog
@@ -51,12 +55,15 @@ class MainWindow(QMainWindow):
         runtime: ServerRuntime,
         settings_manager: SettingsManager,
         settings: Settings,
+        *,
+        enable_canvas: bool = True,
     ) -> None:
         super().__init__()
         self.paths = paths
         self.runtime = runtime
         self.settings_manager = settings_manager
         self.settings = settings
+        self._canvas_enabled = enable_canvas
         state = runtime.app.state.ds
         self.store = state.store
         self.assets = state.assets
@@ -65,6 +72,11 @@ class MainWindow(QMainWindow):
         self.hub = state.hub
 
         self.project: Project | None = None
+        self.canvas: CanvasView | None = None
+        self.history = History()
+        self._selection: list[str] = []
+        self._zoom = 1.0
+        self._grid = False
         self.translator = Translator(settings.lang)
         self.display_manager = DisplayManager(self)
 
@@ -88,6 +100,10 @@ class MainWindow(QMainWindow):
         self._clients_timer.timeout.connect(self._refresh_state)
         self._clients_timer.start()
 
+        self._save_timer = QTimer(self)
+        self._save_timer.setSingleShot(True)
+        self._save_timer.timeout.connect(self._save_project)
+
         self.presenter_panel.set_url(self._player_url())
         self._refresh_state()
         self._startup()
@@ -110,6 +126,41 @@ class MainWindow(QMainWindow):
         self.quit_action = QAction(self)
         self.quit_action.setShortcut(QKeySequence.StandardKey.Quit)
         self.quit_action.triggered.connect(self.close)
+
+        self.save_action = QAction(self)
+        self.save_action.setShortcut(QKeySequence.StandardKey.Save)
+        self.save_action.triggered.connect(self._save_project)
+
+        self.undo_action = QAction(self)
+        self.undo_action.setShortcut(QKeySequence.StandardKey.Undo)
+        self.undo_action.triggered.connect(self._undo)
+
+        self.redo_action = QAction(self)
+        self.redo_action.setShortcut(QKeySequence.StandardKey.Redo)
+        self.redo_action.triggered.connect(self._redo)
+
+        self.duplicate_element_action = QAction(self)
+        self.duplicate_element_action.triggered.connect(self._duplicate_selection)
+
+        self.delete_element_action = QAction(self)
+        self.delete_element_action.triggered.connect(self._delete_selection)
+
+        self.grid_action = QAction(self)
+        self.grid_action.setCheckable(True)
+        self.grid_action.setShortcut(QKeySequence("Ctrl+G"))
+        self.grid_action.toggled.connect(self._set_grid)
+
+        self.zoom_in_action = QAction(self)
+        self.zoom_in_action.setShortcut(QKeySequence("Ctrl+="))
+        self.zoom_in_action.triggered.connect(lambda: self._zoom_by(1.25))
+
+        self.zoom_out_action = QAction(self)
+        self.zoom_out_action.setShortcut(QKeySequence("Ctrl+-"))
+        self.zoom_out_action.triggered.connect(lambda: self._zoom_by(0.8))
+
+        self.zoom_fit_action = QAction(self)
+        self.zoom_fit_action.setShortcut(QKeySequence("Ctrl+0"))
+        self.zoom_fit_action.triggered.connect(lambda: self._set_zoom(1.0))
 
         self.start_action = QAction(self)
         self.start_action.setShortcut(QKeySequence("F5"))
@@ -185,12 +236,14 @@ class MainWindow(QMainWindow):
 
         central = QWidget(self)
         central_layout = QVBoxLayout(central)
-        central_layout.setContentsMargins(18, 18, 18, 18)
+        central_layout.setContentsMargins(0, 0, 0, 0)
         self.canvas_hint = QLabel()
         self.canvas_hint.setObjectName("canvasHint")
         self.canvas_hint.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.canvas_hint.setWordWrap(True)
-        central_layout.addWidget(self.canvas_hint)
+        self.canvas_stack = QStackedWidget(central)
+        self.canvas_stack.addWidget(self.canvas_hint)
+        central_layout.addWidget(self.canvas_stack)
         self.setCentralWidget(central)
 
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.left_dock)
@@ -199,6 +252,7 @@ class MainWindow(QMainWindow):
         self.projects_panel.project_selected.connect(self.open_project)
         self.projects_panel.project_deleted.connect(self._on_project_deleted)
         self.projects_panel.project_renamed.connect(self._on_project_renamed)
+        self.slides_panel.current_changed.connect(self._show_slide)
         self.slides_panel.add_html_requested.connect(self.add_html_slide)
         self.slides_panel.add_pdf_requested.connect(self.import_pdf)
         self.slides_panel.duplicate_requested.connect(self.duplicate_slide)
@@ -217,10 +271,25 @@ class MainWindow(QMainWindow):
         self.file_menu = self.menuBar().addMenu("")
         self.file_menu.addAction(self.new_action)
         self.file_menu.addAction(self.open_action)
+        self.file_menu.addAction(self.save_action)
         self.file_menu.addSeparator()
         self.file_menu.addAction(self.settings_action)
         self.file_menu.addSeparator()
         self.file_menu.addAction(self.quit_action)
+
+        self.edit_menu = self.menuBar().addMenu("")
+        self.edit_menu.addAction(self.undo_action)
+        self.edit_menu.addAction(self.redo_action)
+        self.edit_menu.addSeparator()
+        self.edit_menu.addAction(self.duplicate_element_action)
+        self.edit_menu.addAction(self.delete_element_action)
+
+        self.view_menu = self.menuBar().addMenu("")
+        self.view_menu.addAction(self.grid_action)
+        self.view_menu.addSeparator()
+        self.view_menu.addAction(self.zoom_in_action)
+        self.view_menu.addAction(self.zoom_out_action)
+        self.view_menu.addAction(self.zoom_fit_action)
 
         self.presentation_menu = self.menuBar().addMenu("")
         self.presentation_menu.addAction(self.start_action)
@@ -275,13 +344,24 @@ class MainWindow(QMainWindow):
     def retranslate(self) -> None:
         t = self.translator.t
         self.file_menu.setTitle(t("menu.file"))
+        self.edit_menu.setTitle(t("menu.edit"))
+        self.view_menu.setTitle(t("menu.view"))
         self.presentation_menu.setTitle(t("menu.presentation"))
         self.language_menu.setTitle(t("menu.language"))
         self.help_menu.setTitle(t("menu.help"))
         self.new_action.setText(t("menu.file.new"))
         self.open_action.setText(t("menu.file.open"))
+        self.save_action.setText(t("menu.file.save"))
         self.settings_action.setText(t("menu.file.settings"))
         self.quit_action.setText(t("menu.file.quit"))
+        self.undo_action.setText(t("menu.edit.undo"))
+        self.redo_action.setText(t("menu.edit.redo"))
+        self.duplicate_element_action.setText(t("menu.edit.duplicate"))
+        self.delete_element_action.setText(t("menu.edit.delete"))
+        self.grid_action.setText(t("menu.view.grid"))
+        self.zoom_in_action.setText(t("menu.view.zoom_in"))
+        self.zoom_out_action.setText(t("menu.view.zoom_out"))
+        self.zoom_fit_action.setText(t("menu.view.zoom_fit"))
         self.start_action.setText(t("menu.presentation.start"))
         self.stop_action.setText(t("menu.presentation.stop"))
         self.next_action.setText(t("menu.presentation.next"))
@@ -303,6 +383,8 @@ class MainWindow(QMainWindow):
         self.lang_en.setChecked(self.translator.language == "en")
         self._update_window_title()
         self._refresh_statusbar()
+        if self.canvas is not None:
+            self.canvas.send({"type": "lang", "lang": self.translator.language})
 
     # -- avvio e window state --------------------------------------------
 
@@ -358,9 +440,13 @@ class MainWindow(QMainWindow):
         self.projects_panel.set_current(project.id)
         self.slides_panel.set_slides(project)
         self.presenter_panel.set_project(project)
+        self.history.clear()
+        self._selection = []
+        self._update_history_actions()
         self.settings = self.settings.model_copy(update={"last_project_id": project.id})
         self._save_settings()
         self.retranslate()
+        self._show_slide(0)
         self._refresh_state()
 
     def _on_project_deleted(self, project_id: str) -> None:
@@ -371,6 +457,10 @@ class MainWindow(QMainWindow):
             self.project = None
             self.slides_panel.set_slides(None)
             self.presenter_panel.set_project(None)
+            self.history.clear()
+            self._selection = []
+            self._update_history_actions()
+            self.canvas_stack.setCurrentWidget(self.canvas_hint)
             self.retranslate()
         if self.settings.last_project_id == project_id:
             self.settings = self.settings.model_copy(update={"last_project_id": None})
@@ -391,14 +481,254 @@ class MainWindow(QMainWindow):
     def _save_project(self) -> None:
         if self.project is None:
             return
-        self.project = self.store.save(self.project)
+        self._save_timer.stop()
+        try:
+            self.project = self.store.save(self.project)
+        except Exception as exc:
+            QMessageBox.warning(self, self.translator.t("dialog.error"), str(exc))
+            return
         self.presenter_panel.set_project(self.project)
+        self.statusBar().showMessage(self.translator.t("status.saved"), 1500)
+
+    def _schedule_save(self) -> None:
+        if self.project is None:
+            return
+        self._save_timer.start(self.settings.autosave_ms)
+        self.statusBar().showMessage(self.translator.t("status.modified"), 2000)
 
     def _save_settings(self) -> None:
         try:
             self.settings_manager.save(self.settings)
         except Exception:
             log.exception("impossibile salvare le impostazioni")
+
+    # -- canvas -----------------------------------------------------------
+
+    def _canvas_url(self) -> str:
+        return f"http://127.0.0.1:{self.runtime.port}/editor-canvas"
+
+    def _ensure_canvas(self) -> CanvasView | None:
+        if not self._canvas_enabled:
+            return None
+        if self.canvas is None:
+            self.canvas = CanvasView(
+                self._canvas_url(),
+                self,
+                profile_path=str(self.paths.root / "cache" / "webengine"),
+            )
+            self.canvas.intent.connect(self._on_canvas_intent)
+            self.canvas.ready.connect(self._refresh_canvas)
+            self.canvas_stack.addWidget(self.canvas)
+        self.canvas_stack.setCurrentWidget(self.canvas)
+        return self.canvas
+
+    def _show_slide(self, index: int) -> None:
+        if self.project is None:
+            return
+        index = max(0, min(index, len(self.project.slides) - 1))
+        self._selection = []
+        self._update_history_actions()
+        canvas = self._ensure_canvas()
+        if canvas is None:
+            return
+        canvas.set_slide(
+            self.project,
+            self.project.slides[index],
+            index,
+            selection=[],
+            zoom=self._zoom,
+            grid=self._grid,
+            lang=self.translator.language,
+            pdf_width=self.settings.pdf_render_width,
+        )
+
+    def _refresh_canvas(self) -> None:
+        if self.project is None:
+            return
+        index = max(
+            0, min(self.slides_panel.current_index(), len(self.project.slides) - 1)
+        )
+        canvas = self._ensure_canvas()
+        if canvas is None:
+            return
+        canvas.set_slide(
+            self.project,
+            self.project.slides[index],
+            index,
+            selection=self._selection,
+            zoom=self._zoom,
+            grid=self._grid,
+            lang=self.translator.language,
+            pdf_width=self.settings.pdf_render_width,
+        )
+
+    def _set_grid(self, checked: bool) -> None:
+        self._grid = bool(checked)
+        if self.canvas is not None:
+            self.canvas.set_grid(self._grid)
+
+    def _zoom_by(self, factor: float) -> None:
+        self._set_zoom(self._zoom * factor)
+
+    def _set_zoom(self, value: float) -> None:
+        self._zoom = max(0.25, min(float(value), 2.0))
+        if self.canvas is not None:
+            self.canvas.set_zoom(self._zoom)
+
+    def _on_canvas_intent(self, payload: dict) -> None:
+        action = payload.get("action")
+        data = payload.get("payload")
+        if not isinstance(data, dict):
+            data = {}
+
+        if action == "selection.change":
+            ids = data.get("ids")
+            self._selection = [str(item) for item in ids] if isinstance(ids, list) else []
+            self._update_history_actions()
+            return
+        if action == "zoom.change":
+            self._zoom = max(0.25, min(float(data.get("zoom") or 1.0), 2.0))
+            return
+        if self.project is None:
+            return
+
+        index = max(
+            0, min(self.slides_panel.current_index(), len(self.project.slides) - 1)
+        )
+        slide = self.project.slides[index]
+        commands: list[Command] = []
+
+        if action == "element.update":
+            element_id = data.get("id")
+            changes = data.get("changes")
+            if isinstance(element_id, str) and isinstance(changes, dict):
+                commands.append(
+                    update_element(
+                        slide.id,
+                        element_id,
+                        changes,
+                        merge_key=f"element:{element_id}",
+                    )
+                )
+        elif action == "text.edit":
+            element_id = data.get("id")
+            content = data.get("content")
+            if isinstance(element_id, str) and isinstance(content, dict):
+                try:
+                    element = slide.element(element_id)
+                except KeyError:
+                    pass
+                else:
+                    merged = element.content.model_dump()
+                    merged.update(content)
+                    commands.append(
+                        update_element(
+                            slide.id,
+                            element_id,
+                            {"content": merged},
+                            merge_key=f"text:{element_id}",
+                        )
+                    )
+        elif action == "element.delete":
+            ids = data.get("ids")
+            targets = [str(item) for item in ids] if isinstance(ids, list) else []
+            existing = {element.id for element in slide.elements}
+            for element_id in targets:
+                if element_id in existing:
+                    commands.append(delete_element(slide.id, element_id))
+            self._selection = [
+                item for item in self._selection if item not in set(targets)
+            ]
+        elif action == "element.duplicate":
+            ids = data.get("ids")
+            targets = [str(item) for item in ids] if isinstance(ids, list) else []
+            for element_id in targets:
+                try:
+                    original = slide.element(element_id)
+                except KeyError:
+                    continue
+                clone = original.model_copy(deep=True)
+                clone.id = new_id("element")
+                clone.rect.x += 24
+                clone.rect.y += 24
+                commands.append(add_element(slide.id, clone))
+        elif action == "element.reorder":
+            direction = 1 if int(data.get("direction") or 1) >= 0 else -1
+            ids = data.get("ids")
+            targets = [str(item) for item in ids] if isinstance(ids, list) else []
+            for element_id in targets:
+                try:
+                    element = slide.element(element_id)
+                except KeyError:
+                    continue
+                commands.append(
+                    update_element(
+                        slide.id,
+                        element_id,
+                        {"z": element.z + direction},
+                        merge_key=f"z:{element_id}",
+                    )
+                )
+        elif action == "slide.request":
+            self._refresh_canvas()
+            return
+        else:
+            return
+
+        if commands:
+            self._apply(commands)
+
+    def _apply(self, commands: list[Command]) -> None:
+        if self.project is None:
+            return
+        try:
+            for command in commands:
+                self.history.execute(self.project, command)
+        except Exception as exc:
+            QMessageBox.warning(self, self.translator.t("dialog.error"), str(exc))
+            self._refresh_canvas()
+            return
+        self._update_history_actions()
+        self._refresh_canvas()
+        self._schedule_save()
+
+    def _undo(self) -> None:
+        if self.project is None or not self.history.can_undo:
+            return
+        self.history.undo(self.project)
+        self._selection = []
+        self._update_history_actions()
+        self._refresh_canvas()
+        self._schedule_save()
+
+    def _redo(self) -> None:
+        if self.project is None or not self.history.can_redo:
+            return
+        self.history.redo(self.project)
+        self._selection = []
+        self._update_history_actions()
+        self._refresh_canvas()
+        self._schedule_save()
+
+    def _duplicate_selection(self) -> None:
+        if self._selection:
+            self._on_canvas_intent(
+                {"action": "element.duplicate", "payload": {"ids": list(self._selection)}}
+            )
+
+    def _delete_selection(self) -> None:
+        if self._selection:
+            self._on_canvas_intent(
+                {"action": "element.delete", "payload": {"ids": list(self._selection)}}
+            )
+
+    def _update_history_actions(self) -> None:
+        has_project = self.project is not None
+        self.undo_action.setEnabled(has_project and self.history.can_undo)
+        self.redo_action.setEnabled(has_project and self.history.can_redo)
+        has_selection = has_project and bool(self._selection)
+        self.duplicate_element_action.setEnabled(has_selection)
+        self.delete_element_action.setEnabled(has_selection)
 
     # -- slide ------------------------------------------------------------
 
@@ -419,6 +749,7 @@ class MainWindow(QMainWindow):
         self.project.slides.append(slide)
         self._save_project()
         self.slides_panel.set_slides(self.project, select=len(self.project.slides) - 1)
+        self._show_slide(len(self.project.slides) - 1)
 
     def duplicate_slide(self, row: int) -> None:
         if not self._require_project():
@@ -435,6 +766,7 @@ class MainWindow(QMainWindow):
         self.project.slides.insert(row + 1, clone)
         self._save_project()
         self.slides_panel.set_slides(self.project, select=row + 1)
+        self._show_slide(row + 1)
 
     def delete_slide(self, row: int) -> None:
         if not self._require_project():
@@ -444,9 +776,9 @@ class MainWindow(QMainWindow):
             return
         del self.project.slides[row]
         self._save_project()
-        self.slides_panel.set_slides(
-            self.project, select=min(row, len(self.project.slides) - 1)
-        )
+        selected = min(row, len(self.project.slides) - 1)
+        self.slides_panel.set_slides(self.project, select=selected)
+        self._show_slide(selected)
 
     def move_slide(self, row: int, target: int) -> None:
         if not self._require_project():
@@ -458,6 +790,7 @@ class MainWindow(QMainWindow):
         slides.insert(target, slides.pop(row))
         self._save_project()
         self.slides_panel.set_slides(self.project, select=target)
+        self._show_slide(target)
 
     def reorder_slides(self, order: list[str]) -> None:
         if not self._require_project():
@@ -471,6 +804,7 @@ class MainWindow(QMainWindow):
         self.project.slides = [by_id[slide_id] for slide_id in order]
         self._save_project()
         self.slides_panel.set_slides(self.project, select=selected)
+        self._show_slide(selected)
 
     def import_pdf(self) -> None:
         if not self._require_project():
@@ -506,6 +840,7 @@ class MainWindow(QMainWindow):
         self.project.slides.extend(slides)
         self._save_project()
         self.slides_panel.set_slides(self.project, select=start)
+        self._show_slide(start)
 
     # -- presentazione ----------------------------------------------------
 
@@ -564,6 +899,7 @@ class MainWindow(QMainWindow):
         if kind == "slide" and self.project is not None:
             index = getattr(snapshot, "index", 0)
             self.slides_panel.set_current_index(index)
+            self._show_slide(index)
         if kind in ("open", "close", "slide", "state"):
             self._refresh_statusbar()
             self._update_window_title()
@@ -664,6 +1000,8 @@ class MainWindow(QMainWindow):
         self.controller.set_lang(self.settings.lang)
         self.controller.set_pdf_width(self.settings.pdf_render_width)
         self.translator.set_language(self.settings.lang)
+        if old.pdf_render_width != self.settings.pdf_render_width:
+            self._refresh_canvas()
         if (old.port, old.bind) != (self.settings.port, self.settings.bind):
             QMessageBox.information(
                 self,
@@ -682,6 +1020,8 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event: QCloseEvent) -> None:  # noqa: N802 - API Qt
         self._clients_timer.stop()
+        if self._save_timer.isActive():
+            self._save_project()
         try:
             self._unsubscribe()
         except Exception:

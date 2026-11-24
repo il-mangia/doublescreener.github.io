@@ -40,6 +40,19 @@ async def test_root_redirects_to_info(client: httpx.AsyncClient) -> None:
     assert response.headers["location"] == "/api/info"
 
 
+async def test_canvas_page_and_qwebchannel(client: httpx.AsyncClient) -> None:
+    pytest.importorskip("PyQt6.QtWebChannel")
+
+    page = await client.get("/editor-canvas")
+    assert page.status_code == 200
+    assert "canvas.js" in page.text
+
+    script = await client.get("/qtwebchannel.js")
+    assert script.status_code == 200
+    assert "QWebChannel" in script.text
+    assert script.headers["content-type"].startswith("application/javascript")
+
+
 async def test_create_list_get(client: httpx.AsyncClient) -> None:
     created = await _create(client, "Lezione 1")
     assert created["id"].startswith("prj_")

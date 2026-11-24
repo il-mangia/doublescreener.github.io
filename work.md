@@ -842,18 +842,19 @@ Legenda: `[ ]` da fare · `[~]` in corso · `[x]` fatto
 
 ### M7 — Canvas (3–4 giornate)
 
-- [ ] `QWebEngineView` su `/editor-canvas` (profilo persistente)
-- [ ] `QWebChannel` + `Bridge.intent` / `stateChanged`
-- [ ] Rendering slide con `renderer.js` + overlay di editing
-- [ ] Selezione singola/multipla + rubber band
-- [ ] Drag, resize, rotazione con handle
-- [ ] Snap a griglia + guide di allineamento
-- [ ] Zoom/pan (fit, 25–200%)
-- [ ] Drop dalla palette
-- [ ] Editing testo inline (`contenteditable`, Esc/Invio)
-- [ ] Scorciatoie globali (frecce, Del, Ctrl+D/Z/Y/S)
-- [ ] Sincronizzazione bidirezionale robusta (intent rifiutati → riallineamento)
+- [x] `QWebEngineView` su `/editor-canvas` (profilo persistente)
+- [x] `QWebChannel` + `Bridge.intent` / `stateChanged`
+- [x] Rendering slide con `renderer.js` + overlay di editing
+- [x] Selezione singola/multipla + rubber band
+- [x] Drag, resize, rotazione con handle
+- [x] Snap a griglia + guide di allineamento
+- [x] Zoom/pan (fit, 25-200%)
+- [ ] Drop dalla palette (in M8)
+- [x] Editing testo inline (`contenteditable`, Esc/Invio)
+- [x] Scorciatoie globali (frecce, Del, Ctrl+D/Z/Y/S)
+- [x] Sincronizzazione bidirezionale robusta (intent rifiutati → riallineamento)
 - [ ] Miniature delle slide nel pannello (render headless o canvas)
+- [ ] Smoke test manuale del canvas su desktop reale (QtWebEngine non avviabile in sessione headless)
 
 ### M8 — Inspector, contenuti, template (3 giornate)
 
