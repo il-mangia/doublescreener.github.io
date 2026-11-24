@@ -1,0 +1,14 @@
+{
+  "waiting.title": "In attesa della regia…",
+  "waiting.text": "Apri la regia e avvia una presentazione.",
+  "connecting.title": "Connessione al server…",
+  "connecting.text": "Attendi qualche istante.",
+  "error.title": "Connessione persa",
+  "error.text": "Il server non risponde. Nuovo tentativo automatico.",
+  "retry": "Riprova ora",
+  "fullscreen": "Schermo intero",
+  "reload": "Ricarica",
+  "status.black": "Schermo nero",
+  "status.connecting": "Connessione…",
+  "status.reconnecting": "Riconnessione…"
+}

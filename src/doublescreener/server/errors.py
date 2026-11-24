@@ -79,6 +79,10 @@ def install_error_handlers(app: FastAPI) -> None:
     async def _value(_: Request, exc: ValueError) -> JSONResponse:
         return JSONResponse(status_code=400, content=error_body("bad_request", str(exc)))
 
+    @app.exception_handler(IndexError)
+    async def _index(_: Request, exc: IndexError) -> JSONResponse:
+        return JSONResponse(status_code=400, content=error_body("bad_index", str(exc)))
+
     @app.exception_handler(DoubleScreenerError)
     async def _generic(_: Request, exc: DoubleScreenerError) -> JSONResponse:
         return JSONResponse(status_code=400, content=error_body("error", str(exc)))

@@ -1,0 +1,72 @@
+/* Animazioni di ingresso degli elementi (proprietà translate/scale: non
+   sovrascrivono la rotazione impostata con transform). */
+@keyframes ds-fadeIn {
+  from { opacity: 0; }
+  to { opacity: var(--ds-opacity, 1); }
+}
+
+@keyframes ds-slideUp {
+  from { opacity: 0; translate: 0 32px; }
+  to { opacity: var(--ds-opacity, 1); translate: 0 0; }
+}
+
+@keyframes ds-slideDown {
+  from { opacity: 0; translate: 0 -32px; }
+  to { opacity: var(--ds-opacity, 1); translate: 0 0; }
+}
+
+@keyframes ds-slideLeft {
+  from { opacity: 0; translate: 48px 0; }
+  to { opacity: var(--ds-opacity, 1); translate: 0 0; }
+}
+
+@keyframes ds-slideRight {
+  from { opacity: 0; translate: -48px 0; }
+  to { opacity: var(--ds-opacity, 1); translate: 0 0; }
+}
+
+@keyframes ds-zoomIn {
+  from { opacity: 0; scale: 0.9; }
+  to { opacity: var(--ds-opacity, 1); scale: 1; }
+}
+
+@keyframes ds-bounce {
+  0% { opacity: 0; translate: 0 48px; }
+  60% { opacity: 1; translate: 0 -10px; }
+  80% { translate: 0 4px; }
+  100% { opacity: var(--ds-opacity, 1); translate: 0 0; }
+}
+
+/* Transizioni tra slide, applicate al contenitore. */
+@keyframes ds-slide-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes ds-slide-slide {
+  from { opacity: 0; translate: 56px 0; }
+  to { opacity: 1; translate: 0 0; }
+}
+
+@keyframes ds-slide-zoom {
+  from { opacity: 0; scale: 0.965; }
+  to { opacity: 1; scale: 1; }
+}
+
+.ds-transition-fade {
+  animation-name: ds-slide-fade;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+.ds-transition-slide {
+  animation-name: ds-slide-slide;
+  animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+  animation-fill-mode: both;
+}
+
+.ds-transition-zoom {
+  animation-name: ds-slide-zoom;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}

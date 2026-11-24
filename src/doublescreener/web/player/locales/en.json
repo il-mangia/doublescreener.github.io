@@ -1,0 +1,14 @@
+{
+  "waiting.title": "Waiting for the director…",
+  "waiting.text": "Open the director app and start a presentation.",
+  "connecting.title": "Connecting to the server…",
+  "connecting.text": "Please wait a moment.",
+  "error.title": "Connection lost",
+  "error.text": "The server is not responding. Retrying automatically.",
+  "retry": "Retry now",
+  "fullscreen": "Fullscreen",
+  "reload": "Reload",
+  "status.black": "Black screen",
+  "status.connecting": "Connecting…",
+  "status.reconnecting": "Reconnecting…"
+}

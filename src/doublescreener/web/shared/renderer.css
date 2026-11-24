@@ -1,0 +1,25 @@
+/* Struttura minima della slide, condivisa da player, canvas ed export. */
+.ds-slide {
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.ds-slide .ds-element {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.ds-slide .ds-pdf-page {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000000;
+}
+
+.ds-slide img {
+  user-select: none;
+  -webkit-user-drag: none;
+}

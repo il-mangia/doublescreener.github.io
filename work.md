@@ -777,7 +777,7 @@ Legenda: `[ ]` da fare · `[~]` in corso · `[x]` fatto
 - [x] `LICENSE` con GNU GPL v3.0, nota di licenza in README e link nel footer della landing
 - [x] `pyproject.toml` con dipendenze ed extra `dev` (`license = "GPL-3.0-only"`)
 - [x] `.gitignore` (`data/`, `.venv/`, `__pycache__/`, `*.pyc`, `build/`, `dist/`, `.ruff_cache/`)
-- [~] Struttura cartelle `src/doublescreener/**` con `__init__.py` minimi (`core` e `ui` pronti, `server`/`web` in M2–M3)
+- [x] Struttura cartelle `src/doublescreener/**` con `__init__.py` minimi (`core`, `server`, `web`, `ui`)
 - [x] `config.py` + `logging_setup.py` + CLI (`--data-dir`, `--port`, `--debug`)
 - [x] `python -m doublescreener --help` funzionante
 - [ ] Smoke test: QApplication vuota che si apre e si chiude (richiede extra `gui`, in M6)
@@ -791,7 +791,7 @@ Legenda: `[ ]` da fare · `[~]` in corso · `[x]` fatto
 - [x] `assets.py`: upload, hash SHA-256 per dedupe, probing dimensioni
 - [x] `history.py`: comandi, undo/redo, coalescing, limite
 - [x] `migrate(data)` con `schema_version`
-- [x] Test: `test_models.py`, `test_store.py`, `test_history.py` (63 test totali, tutti verdi)
+- [x] Test: `test_models.py`, `test_store.py`, `test_history.py` (suite completa: 93 test, tutti verdi)
 
 ### M2 — API (1 giornata)
 
@@ -799,25 +799,25 @@ Legenda: `[ ]` da fare · `[~]` in corso · `[x]` fatto
 - [x] CRUD progetti + duplicate + `If-Match`
 - [x] Upload/download asset
 - [x] `GET /api/info` con IP LAN e URL player
-- [ ] Mount statici `/p`, `/player`, `/editor-canvas`, `/assets` (in M3, insieme al player)
+- [x] Mount statici `/p`, `/player` e asset (`/editor-canvas` arriva in M8)
 - [x] Test `test_api.py` con `httpx` (CRUD, upload, errori, conflitti) + avvio/stop `ServerRuntime` reale
 
 ### M3 — Renderer e player (2 giornate)
 
-- [ ] `renderer.js`: slide → DOM, stili, z-index, transizioni
-- [ ] `player/index.html|css|js`: fullscreen, letterbox, stati waiting/error/black
-- [ ] Client WS: hello, session, slide, state, reload, ping/pong, riconnessione
-- [ ] Prefetch asset e pagina PDF successiva
-- [ ] Localizzazione player (`?lang=`)
+- [x] `renderer.js`: slide → DOM, stili, z-index, transizioni
+- [x] `player/index.html|css|js`: fullscreen, letterbox, stati waiting/error/black
+- [x] Client WS: hello, session, slide, state, reload, ping/pong, riconnessione
+- [x] Prefetch asset e pagina PDF successiva
+- [x] Localizzazione player (`?lang=`)
 - [ ] Test manuale con 2 dispositivi reali (PC + TV/tablet)
 
 ### M4 — Hub WS e presentazione (1–2 giornate)
 
-- [ ] `ws.py`: connection manager, ruoli, broadcast, presence
-- [ ] `presentation.py`: open/goto/step/black, stato coerente
-- [ ] Broadcast `slide`/`state` + `ack` diagnostica
-- [ ] Test `test_ws.py` (connessione, handshake, reconnect, black, cambio progetto)
-- [ ] Endpoint REST di presentazione allineati allo stato WS
+- [x] `ws.py`: connection manager, ruoli, broadcast, presence
+- [x] `presentation.py`: open/goto/step/black, stato coerente
+- [x] Broadcast `slide`/`state` + `ack` diagnostica
+- [x] Test `test_ws.py` (connessione, handshake, reconnect, black, cambio progetto)
+- [x] Endpoint REST di presentazione allineati allo stato WS
 
 ### M5 — PDF (2 giornate)
 

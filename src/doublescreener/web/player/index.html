@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <title>DoubleScreener · Second screen</title>
+  <link rel="stylesheet" href="/static/shared/renderer.css">
+  <link rel="stylesheet" href="/static/shared/transitions.css">
+  <link rel="stylesheet" href="/static/player/player.css">
+</head>
+<body>
+  <main id="stage-wrap" class="stage-wrap" aria-live="polite">
+    <div id="stage" class="stage" role="img" aria-label="Slide"></div>
+  </main>
+
+  <section id="overlay" class="overlay" role="status">
+    <div class="overlay-card">
+      <div class="spinner" aria-hidden="true"></div>
+      <h1 id="overlay-title">Connessione…</h1>
+      <p id="overlay-text">Attendi qualche istante.</p>
+      <button id="retry" class="btn" type="button" hidden>Riprova ora</button>
+    </div>
+  </section>
+
+  <div id="controls" class="controls" role="toolbar" aria-label="Controlli schermo">
+    <span id="status" class="status"></span>
+    <button id="fullscreen" type="button" title="Schermo intero" aria-label="Schermo intero">⛶</button>
+    <button id="reload" type="button" title="Ricarica" aria-label="Ricarica">⟳</button>
+  </div>
+
+  <noscript>DoubleScreener richiede JavaScript per mostrare la presentazione.</noscript>
+
+  <script src="/static/shared/renderer.js"></script>
+  <script src="/static/player/player.js"></script>
+</body>
+</html>

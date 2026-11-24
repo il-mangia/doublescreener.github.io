@@ -3,10 +3,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 from ..config import Paths, Settings, SettingsManager
 from ..core.assets import AssetStore
 from ..core.store import ProjectStore
+
+if TYPE_CHECKING:
+    from ..core.presentation import PresentationController
+    from .ws import WebSocketHub
 
 
 @dataclass(slots=True)
@@ -16,5 +21,7 @@ class AppState:
     settings_manager: SettingsManager
     store: ProjectStore
     assets: AssetStore
+    controller: PresentationController
+    hub: WebSocketHub
     port: int
     lan_ip: str
