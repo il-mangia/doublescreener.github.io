@@ -15,7 +15,6 @@ Requirements: **Python 3.11+** and Git. On Linux, install the Qt/WebEngine libra
 ```bash
 git clone https://github.com/il-mangia/doublescreener.github.io.git
 cd doublescreener.github.io
-git switch v2-rewrite        # development branch of the v2 rewrite
 
 python -m venv .venv
 # Windows

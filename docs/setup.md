@@ -11,7 +11,6 @@
 ```powershell
 git clone https://github.com/il-mangia/doublescreener.github.io.git
 cd doublescreener.github.io
-git switch v2-rewrite
 
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1

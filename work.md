@@ -1,7 +1,7 @@
 # DoubleScreener v2 — Piano di lavoro
 
-**Stato:** pianificazione approvata, implementazione non iniziata
-**Branch:** `v2-rewrite` (il branch `main` resta intatto e continua a servire GitHub Pages)
+**Stato:** implementazione M0–M10 completata, M11 (packaging e QA) in corso
+**Branch:** `main` (la v2 è stata unita a `main`; il branch di sviluppo `v2-rewrite` è stato eliminato)
 **Data:** 23 novembre 2026
 **Autore:** sessione di analisi e progettazione
 
@@ -62,7 +62,7 @@ Account utente, collaborazione in tempo reale multi-utente, cloud sync, app mobi
 | Navigazione | La regia è autoritaria, i client seguono |
 | Lingua | Interfaccia bilingue IT/EN con i18n; documenti di lavoro in italiano |
 | Codice v1 | Riscrittura da zero, conservando logo, landing e demo storica |
-| Git | Branch `v2-rewrite`, `main` intatto |
+| Git | Branch `main`, v2 unita e `v2-rewrite` eliminato |
 
 ---
 
@@ -683,10 +683,9 @@ class Command:
 
 La repo è `doublescreener.github.io`, quindi il sito vive sul branch `main`. Regole:
 
-- `main` resta la sorgente del sito: `index.html`, `style.css`, `logo.png`, `app/` non vengono rimossi.
-- `v2-rewrite` non è pubblicato: Pages continua a servire `main` finché la v2 non è pronta.
-- La landing va aggiornata per **raccontare il progetto e il setup**, non per far girare il backend (Pages è solo statico).
-- La demo v1 rimane raggiungibile da `app/backend.html` con un badge "v1 — demo storica".
+- `main` è la sorgente del sito e del codice v2: `index.html`, `style.css`, `logo.png`, `favicon.svg` e il pacchetto Python.
+- La vecchia demo v1 (`app/backend.html`, `app/frontend.html`, `app/sniffer.html`) è stata eliminata: la landing presenta il progetto e il setup, non fa girare il backend (Pages è solo statico).
+- La landing è bilingue IT/EN, con temi chiaro/scuro e istruzioni di installazione da sorgente.
 
 **Contenuti landing aggiornati**
 
@@ -734,10 +733,9 @@ La repo è `doublescreener.github.io`, quindi il sito vive sul branch `main`. Re
 ## 19. Comandi di sviluppo
 
 ```powershell
-# 1. Clona e entra nel branch
+# 1. Clona il repository
 git clone https://github.com/il-mangia/doublescreener.github.io.git
 cd doublescreener.github.io
-git switch v2-rewrite
 
 # 2. Ambiente virtuale
 python -m venv .venv
