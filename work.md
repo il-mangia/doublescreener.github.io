@@ -887,7 +887,7 @@ Legenda: `[ ]` da fare · `[~]` in corso · `[x]` fatto
 - [x] Diagnostica: "copia info sistema"
 - [x] `docs/architecture.md`, `api.md`, `ws-protocol.md`, `setup.md`
 - [x] README bilingue + quick start
-- [ ] Landing GitHub Pages aggiornata (hero, feature, setup, IT/EN)
+- [x] Landing GitHub Pages aggiornata (presentazione del progetto, nessuna demo web, IT/EN)
 - [ ] QA matrix: Windows 10/11, Chrome/Edge/Firefox, Smart TV, tablet
 - [ ] Tag `v2.0.0` e note di rilascio
 

@@ -1,706 +1,511 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DoubleScreener - Dual Screen Projection Tool</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Roboto+Slab:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DoubleScreener — Regia desktop per presentazioni su due schermi</title>
+  <meta name="description" content="DoubleScreener è una regia desktop open source per creare slide HTML, importare PDF e proiettarle su TV, tablet e altri PC tramite browser, sulla rete locale.">
+  <meta name="theme-color" content="#0a0c11">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="style.css">
+  <link rel="canonical" href="https://il-mangia.github.io/doublescreener.github.io/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="DoubleScreener — Regia desktop per presentazioni su due schermi">
+  <meta property="og:description" content="Editor visuale per slide HTML, import PDF e second screen nel browser. Locale, open source, senza cloud.">
+  <meta property="og:image" content="https://il-mangia.github.io/doublescreener.github.io/logo.png">
+  <meta property="og:url" content="https://il-mangia.github.io/doublescreener.github.io/">
+  <meta name="twitter:card" content="summary_large_image">
+  <script>
+    // Applica il tema prima del paint per evitare il lampo chiaro/scuro.
+    (function () {
+      try {
+        var requested = new URLSearchParams(window.location.search).get("theme");
+        var stored = localStorage.getItem("ds-theme");
+        var theme =
+          requested === "light" || requested === "dark"
+            ? requested
+            : stored || (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.classList.add("js");
+      } catch (error) {
+        document.documentElement.classList.add("js");
+      }
+    })();
+  </script>
+  <script src="site.js" defer></script>
 </head>
-<body>
-    <div class="container">
-        <div class="animated-bg">
-            <div class="bg-circle circle-1"></div>
-            <div class="bg-circle circle-2"></div>
-            <div class="bg-circle circle-3"></div>
-        </div>
-        
-        <header class="animate-on-scroll">
-            <div class="logo-container">
-                <div class="logo-icon-wrapper">
-                    <i class="fas fa-desktop logo-icon"></i>
-                    <div class="logo-pulse"></div>
-                </div>
-                <h1>Double<span>Screener</span></h1>
-            </div>
-            <p class="tagline">Dual Screen Projection Made Simple</p>
-            <div class="header-decoration">
-                <div class="decoration-line"></div>
-                <div class="decoration-dot"></div>
-                <div class="decoration-line"></div>
-            </div>
-        </header>
+<body id="top">
+  <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-monitor" viewBox="0 0 24 24">
+      <rect x="2" y="3" width="20" height="14" rx="2"></rect>
+      <path d="M8 21h8M12 17v4"></path>
+    </symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24">
+      <path d="M12 20h9"></path>
+      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+    </symbol>
+    <symbol id="i-file" viewBox="0 0 24 24">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"></path>
+      <path d="M14 2v6h6M8 13h8M8 17h5"></path>
+    </symbol>
+    <symbol id="i-move" viewBox="0 0 24 24">
+      <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"></path>
+    </symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24">
+      <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"></path>
+    </symbol>
+    <symbol id="i-layout" viewBox="0 0 24 24">
+      <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+      <path d="M3 9h18M9 21V9"></path>
+    </symbol>
+    <symbol id="i-cast" viewBox="0 0 24 24">
+      <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"></path>
+      <path d="M2 20h.01"></path>
+    </symbol>
+    <symbol id="i-download" viewBox="0 0 24 24">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+      <path d="M7 10l5 5 5-5M12 15V3"></path>
+    </symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"></path>
+      <path d="M9 12l2 2 4-4"></path>
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24">
+      <path d="M20 6L9 17l-5-5"></path>
+    </symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24">
+      <path d="M5 12h14M12 5l7 7-7 7"></path>
+    </symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24">
+      <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+    </symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="4"></circle>
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+    </symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"></path>
+    </symbol>
+    <symbol id="i-server" viewBox="0 0 24 24">
+      <rect x="2" y="2" width="20" height="8" rx="2"></rect>
+      <rect x="2" y="14" width="20" height="8" rx="2"></rect>
+      <path d="M6 6h.01M6 18h.01"></path>
+    </symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z"></path>
+    </symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24">
+      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8Z"></path>
+    </symbol>
+    <symbol id="i-qr" viewBox="0 0 24 24">
+      <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+      <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+      <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+      <path d="M14 14h3v3h-3zM21 14v3M14 21h3M21 21v.01"></path>
+    </symbol>
+    <symbol id="i-info" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="M12 16v-4M12 8h.01"></path>
+    </symbol>
+    <symbol id="i-github" viewBox="0 0 24 24">
+      <path fill="currentColor" stroke="none" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.91c.58.11.79-.25.79-.55v-2.14c-3.2.7-3.88-1.36-3.88-1.36-.52-1.34-1.28-1.7-1.28-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"></path>
+    </symbol>
+  </svg>
 
-        <main>
-            <section class="hero">
-                <div class="hero-content animate-on-scroll">
-                    <div class="section-badge">
-                        <i class="fas fa-rocket"></i>
-                        <span>Introducing</span>
-                    </div>
-                    <h2>What is <span class="highlight">DoubleScreener</span>?</h2>
-                    <p class="description">
-                        DoubleScreener is a powerful web application designed to help users project texts, images, and presentations on a second screen through two interconnected interfaces. 
-                        Perfect for presentations, teaching, gaming sessions, and events.
-                    </p>
-                    
-                    <div class="stats">
-                        <div class="stat">
-                            <div class="stat-number" data-count="100">0</div>
-                            <div class="stat-label">Real-time Updates</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number" data-count="10">0</div>
-                            <div class="stat-label">Screens Connected</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number" data-count="1">0</div>
-                            <div class="stat-label">Latency (ms)</div>
-                        </div>
-                    </div>
-                    
-                    <div class="features">
-                        <div class="feature">
-                            <div class="feature-icon">
-                                <i class="fas fa-sliders-h"></i>
-                            </div>
-                            <h3>Backend Controls</h3>
-                            <p>Full control over content with an intuitive interface. Manage text, images, and layouts.</p>
-                            <div class="feature-badge">Advanced</div>
-                        </div>
-                        <div class="feature">
-                            <div class="feature-icon">
-                                <i class="fas fa-tv"></i>
-                            </div>
-                            <h3>Frontend Display</h3>
-                            <p>Clean presentation optimized for secondary screens with fullscreen support.</p>
-                            <div class="feature-badge">Optimized</div>
-                        </div>
-                        <div class="feature">
-                            <div class="feature-icon">
-                                <i class="fas fa-sync-alt"></i>
-                            </div>
-                            <h3>Real-time Sync</h3>
-                            <p>Changes appear instantly on the frontend with WebSocket technology.</p>
-                            <div class="feature-badge">Live</div>
-                        </div>
-                        <div class="feature">
-                            <div class="feature-icon">
-                                <i class="fa-solid fa-keyboard"></i>
-                            </div>
-                            <h3>Open Source</h3>
-                            <p>This project is Open Soruce! You can help us when you want via GitHub.</p>
-                            <div class="feature-badge">Developing</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="cta-section animate-on-scroll">
-                    <div class="cta-card">
-                        <div class="cta-header">
-                            <h3><i class="fas fa-play-circle"></i> Get Started Now</h3>
-                            <p class="cta-subtitle">Open both pages to start using DoubleScreener in seconds</p>
-                        </div>
-                        
-                        <div class="buttons">
-                            <button class="btn backend-btn" onclick="location.href='app/backend.html'">
-                                <div class="btn-icon">
-                                    <i class="fas fa-cogs"></i>
-                                </div>
-                                <div class="btn-content">
-                                    <div class="btn-title">Backend (Control)</div>
-                                    <div class="btn-subtitle">Manage content</div>
-                                </div>
-                                <i class="fas fa-chevron-right btn-arrow"></i>
-                            </button>
-                            
-                            <button class="btn frontend-btn" onclick="openFrontend()">
-                                <div class="btn-icon">
-                                    <i class="fas fa-desktop"></i>
-                                </div>
-                                <div class="btn-content">
-                                    <div class="btn-title">Frontend (Display)</div>
-                                    <div class="btn-subtitle">View content</div>
-                                </div>
-                                <i class="fas fa-chevron-right btn-arrow"></i>
-                            </button>
-                            
-                            <button class="btn both-btn" onclick="openBoth()">
-                                <div class="btn-icon">
-                                    <i class="fas fa-play-circle"></i>
-                                </div>
-                                <div class="btn-content">
-                                    <div class="btn-title">Launch Both</div>
-                                    <div class="btn-subtitle">Full experience</div>
-                                </div>
-                                <i class="fas fa-external-link-alt btn-arrow"></i>
-                            </button>
-                        </div>
-                        
-                        <div class="quick-tip">
-                            <i class="fas fa-lightbulb"></i>
-                            <span><strong>Tip:</strong> Use dual monitors for the best experience</span>
-                        </div>
-                        
-                        <div class="instructions">
-                            <h4><i class="fas fa-graduation-cap"></i> How to Use:</h4>
-                            <div class="steps">
-                                <div class="step">
-                                    <div class="step-number">1</div>
-                                    <div class="step-content">
-                                        <strong>Open the Backend</strong> page for controls on your main screen
-                                    </div>
-                                </div>
-                                <div class="step">
-                                    <div class="step-number">2</div>
-                                    <div class="step-content">
-                                        <strong>Open the Frontend</strong> page on your second screen or projector
-                                    </div>
-                                </div>
-                                <div class="step">
-                                    <div class="step-number">3</div>
-                                    <div class="step-content">
-                                        <strong>Use backend controls</strong> to update content in real-time
-                                    </div>
-                                </div>
-                                <div class="step">
-                                    <div class="step-number">4</div>
-                                    <div class="step-content">
-                                        <strong>Watch changes appear</strong> instantly on the frontend display
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="use-cases">
-                            <h5><i class="fas fa-star"></i> Perfect For:</h5>
-                            <div class="case-tags">
-                                <span class="case-tag">Presentations</span>
-                                <span class="case-tag">Classroom Teaching</span>
-                                <span class="case-tag">Gaming Sessions</span>
-                                <span class="case-tag">Events & Conferences</span>
-                                <span class="case-tag">Remote Collaboration</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <section class="demo-preview">
-                <div class="section-header">
-                    <h2>Live Demo Preview</h2>
-                    <p class="section-subtitle">See how DoubleScreener works in action</p>
-                </div>
-                
-                <div class="preview-container">
-                    <div class="preview-window backend-preview animate-on-scroll">
-                        <div class="preview-header">
-                            <div class="window-controls">
-                                <span class="control close"></span>
-                                <span class="control minimize"></span>
-                                <span class="control maximize"></span>
-                            </div>
-                            <div class="window-title">Backend Controls</div>
-                            <div class="window-status">
-                                <i class="fas fa-circle status-connected"></i>
-                                <span>Connected</span>
-                            </div>
-                        </div>
-                        <div class="preview-content">
-                            <div class="preview-controls">
-                                <div class="control-group">
-                                    <label>Text Content</label>
-                                    <div class="preview-textarea active">
-                                        <div class="textarea-content">Welcome to DoubleScreener! This is a live preview...</div>
-                                        <div class="textarea-cursor"></div>
-                                    </div>
-                                </div>
-                                
-                                <div class="control-group">
-                                    <label>Background Color</label>
-                                    <div class="color-picker">
-                                        <span class="color-option" style="background: #1b9af7;"></span>
-                                        <span class="color-option" style="background: #6c63ff;"></span>
-                                        <span class="color-option" style="background: #2dd4bf;"></span>
-                                        <span class="color-option" style="background: #f59e0b;"></span>
-                                        <span class="color-option" style="background: #ef4444;"></span>
-                                    </div>
-                                </div>
-                                
-                                <div class="control-group">
-                                    <label>Font Size</label>
-                                    <div class="preview-slider">
-                                        <div class="slider-track"></div>
-                                        <div class="slider-thumb"></div>
-                                        <div class="slider-value">24px</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="control-buttons">
-                                    <div class="preview-button primary">
-                                        <i class="fas fa-sync-alt"></i>
-                                        Update Display
-                                    </div>
-                                    <div class="preview-button secondary">
-                                        <i class="fas fa-image"></i>
-                                        Add Image
-                                    </div>
-                                    <div class="preview-button secondary">
-                                        <i class="fas fa-trash-alt"></i>
-                                        Clear
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="preview-connector animate-on-scroll">
-                        <div class="connector-line"></div>
-                        <div class="connector-dots">
-                            <div class="dot"></div>
-                            <div class="dot"></div>
-                            <div class="dot"></div>
-                        </div>
-                        <div class="connector-label">
-                            <i class="fas fa-bolt"></i>
-                            Real-time Sync
-                            <i class="fas fa-bolt"></i>
-                        </div>
-                    </div>
-                    
-                    <div class="preview-window frontend-preview animate-on-scroll">
-                        <div class="preview-header">
-                            <div class="window-controls">
-                                <span class="control close"></span>
-                                <span class="control minimize"></span>
-                                <span class="control maximize"></span>
-                            </div>
-                            <div class="window-title">Frontend Display</div>
-                            <div class="window-status">
-                                <i class="fas fa-sync-alt status-syncing"></i>
-                                <span>Syncing...</span>
-                            </div>
-                        </div>
-                        <div class="preview-content">
-                            <div class="preview-slide active">
-                                <div class="slide-header">
-                                    <div class="slide-number">Slide 1</div>
-                                    <div class="slide-timer">00:45</div>
-                                </div>
-                                <div class="slide-content">
-                                    <h3 class="slide-title">Welcome to DoubleScreener!</h3>
-                                    <p class="slide-text">This is a live preview of how your content will appear on the second screen. Changes made on the backend appear here instantly.</p>
-                                    <div class="slide-features">
-                                        <div class="slide-feature">
-                                            <i class="fas fa-bolt"></i>
-                                            Real-time Updates
-                                        </div>
-                                        <div class="slide-feature">
-                                            <i class="fas fa-palette"></i>
-                                            Customizable
-                                        </div>
-                                        <div class="slide-feature">
-                                            <i class="fas fa-expand"></i>
-                                            Fullscreen Ready
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="slide-footer">
-                                    <div class="slide-progress">
-                                        <div class="progress-bar" style="width: 45%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="demo-controls animate-on-scroll">
-                    <button class="demo-btn" id="demoPrev">
-                        <i class="fas fa-chevron-left"></i> Previous Demo
-                    </button>
-                    <div class="demo-indicator">
-                        <span class="indicator-dot active"></span>
-                        <span class="indicator-dot"></span>
-                        <span class="indicator-dot"></span>
-                        <span class="indicator-dot"></span>
-                    </div>
-                    <button class="demo-btn" id="demoNext">
-                        Next Demo <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
-            </section>
-            
-            <!-- Features Section -->
-            <section class="features-grid animate-on-scroll">
-                <div class="section-header">
-                    <h2>Powerful Features</h2>
-                    <p class="section-subtitle">Everything you need for perfect dual-screen presentations</p>
-                </div>
-                
-                <div class="features-container">
-                    <div class="feature-card">
-                        <div class="feature-card-icon">
-                            <i class="fas fa-broadcast-tower"></i>
-                        </div>
-                        <h3>Instant Updates</h3>
-                        <p>See changes on the frontend display as you type. No refresh needed.</p>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <div class="feature-card-icon">
-                            <i class="fas fa-image"></i>
-                        </div>
-                        <h3>Image Support</h3>
-                        <p>Upload and display images on your secondary screen with ease.</p>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <div class="feature-card-icon">
-                            <i class="fas fa-text-height"></i>
-                        </div>
-                        <h3>Text Formatting</h3>
-                        <p>Control font size, color, alignment, and styling in real-time.</p>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <div class="feature-card-icon">
-                            <i class="fas fa-columns"></i>
-                        </div>
-                        <h3>Multiple Layouts</h3>
-                        <p>Choose from various display layouts optimized for different content types.</p>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <div class="feature-card-icon">
-                            <i class="fas fa-history"></i>
-                        </div>
-                        <h3>History & Undo</h3>
-                        <p>Keep track of changes and revert if needed with undo/redo functionality.</p>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <div class="feature-card-icon">
-                            <i class="fas fa-mobile-alt"></i>
-                        </div>
-                        <h3>Mobile Friendly</h3>
-                        <p>Works perfectly on tablets and mobile devices as secondary displays.</p>
-                    </div>
-                </div>
-            </section>
-        </main>
-        
-        <footer class="animate-on-scroll">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <i class="fas fa-desktop"></i>
-                    <h3>Double<span>Screener</span></h3>
-                </div>
-                <p class="footer-tagline">Dual Screen Projection Made Simple</p>
-                
-                <div class="footer-links">
-                    <a href="https://github.com/il-mangia/doublescreener.github.io/" target="_blank" class="footer-link">
-                        <i class="fab fa-github"></i>
-                        <span>GitHub</span>
-                    </a>
-                    <a href="LICENSE" target="_blank" class="footer-link">
-                        <i class="fas fa-balance-scale"></i>
-                        <span>GPL-3.0</span>
-                    </a>
-                    <a href="https://github.com/il-mangia/doublescreener.github.io/issues/" class="footer-link">
-                        <i class="fas fa-comment-dots"></i>
-                        <span>Feedback</span>
-                    </a>
-                    <a href="https://github.com/il-mangia/doublescreener.github.io/wiki/" class="footer-link" onclick="showAbout()">
-                        <i class="fas fa-info-circle"></i>
-                        <span>Wiki</span>
-                    </a>
-                </div>
-                
-                <div class="footer-cta">
-                    <p>Ready to try DoubleScreener?</p>
-                    <button class="btn both-btn" onclick="openBoth()">
-                        <i class="fas fa-play-circle"></i>
-                        Launch Both Screens
-                    </button>
-                </div>
-                
-                <div class="footer-bottom">
-                    <p>Open Source project by il-mangia, TheLogicalFounder, spasca</p>
-                    <div class="footer-tech">
-                        <span>Built with</span>
-                        <i class="fab fa-html5"></i>
-                        <i class="fab fa-css3-alt"></i>
-                        <i class="fab fa-js"></i>
-                    </div>
-                    <br>
-                    <p>Please, don't "vibe coding". GitHub is for real developers, not for fake.</p>
-                </div>
+  <a class="skip-link" href="#main" data-i18n="a11y.skip">Vai al contenuto</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#top" aria-label="DoubleScreener">
+        <img class="logo logo-dark" src="logo.png" alt="DoubleScreener" width="130" height="35">
+        <img class="logo logo-light" src="logo-light.png" alt="DoubleScreener" width="130" height="35">
+      </a>
+
+      <nav class="nav" aria-label="Navigazione principale" data-i18n-label="a11y.nav">
+        <a href="#progetto" data-i18n="nav.about">Il progetto</a>
+        <a href="#funzioni" data-i18n="nav.features">Funzionalità</a>
+        <a href="#come" data-i18n="nav.how">Come funziona</a>
+        <a href="#installa" data-i18n="nav.install">Installa</a>
+        <a href="#stato" data-i18n="nav.status">Stato</a>
+      </nav>
+
+      <div class="header-actions">
+        <div class="lang-switch" role="group" aria-label="Lingua / Language" data-i18n-label="a11y.lang">
+          <button type="button" data-lang="it" aria-pressed="true">IT</button>
+          <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        </div>
+        <button class="icon-button" id="themeToggle" type="button" aria-label="Cambia tema" data-i18n-label="a11y.theme">
+          <svg class="icon icon-sun"><use href="#i-sun"></use></svg>
+          <svg class="icon icon-moon"><use href="#i-moon"></use></svg>
+        </button>
+        <a class="button small ghost" href="https://github.com/il-mangia/doublescreener.github.io" target="_blank" rel="noopener">
+          <svg class="icon"><use href="#i-github"></use></svg>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="pulse"></span><span data-i18n="hero.eyebrow">Applicazione desktop · Open source</span></p>
+          <h1 data-i18n-html="hero.title">La regia delle tue presentazioni, <span class="grad">su ogni schermo.</span></h1>
+          <p class="lead" data-i18n="hero.lead">DoubleScreener unisce un editor visuale per slide HTML a un secondo schermo che vive nel browser. Gira sul tuo computer, senza cloud e senza account: TV, tablet e altri PC si collegano dalla rete locale.</p>
+
+          <div class="hero-actions">
+            <a class="button primary" href="#installa">
+              <svg class="icon"><use href="#i-download"></use></svg>
+              <span data-i18n="hero.cta.install">Come installarlo</span>
+            </a>
+            <a class="button ghost" href="https://github.com/il-mangia/doublescreener.github.io" target="_blank" rel="noopener">
+              <svg class="icon"><use href="#i-github"></use></svg>
+              <span data-i18n="hero.cta.github">Vedi su GitHub</span>
+            </a>
+          </div>
+
+          <ul class="chips">
+            <li data-i18n="hero.chip.os">Windows · Linux · macOS</li>
+            <li data-i18n="hero.chip.python">Python 3.11+</li>
+            <li data-i18n="hero.chip.account">Nessun account</li>
+            <li data-i18n="hero.chip.license">GPL-3.0</li>
+          </ul>
+        </div>
+
+        <div class="hero-art" aria-hidden="true">
+          <div class="mock-window">
+            <div class="mock-bar">
+              <span class="mock-dots"><i></i><i></i><i></i></span>
+              <span class="mock-title" data-i18n="mock.title">DoubleScreener · regia</span>
+              <span class="mock-badge">F5</span>
             </div>
-        </footer>
+            <div class="mock-body">
+              <div class="mock-pane mock-slides">
+                <span class="mock-pane-title" data-i18n="mock.slides">Slide</span>
+                <div class="mock-thumb is-active"><i></i><i></i></div>
+                <div class="mock-thumb"><i></i><i></i></div>
+                <div class="mock-thumb"><i></i><i></i></div>
+              </div>
+              <div class="mock-stage">
+                <div class="mock-slide">
+                  <span class="mock-kicker"></span>
+                  <span class="mock-h1"></span>
+                  <span class="mock-h2"></span>
+                  <span class="mock-copy"><i></i><i></i><i></i></span>
+                  <span class="mock-handle tl"></span>
+                  <span class="mock-handle tr"></span>
+                  <span class="mock-handle bl"></span>
+                  <span class="mock-handle br"></span>
+                </div>
+                <div class="mock-zoom"><span>−</span><b>60%</b><span>+</span></div>
+              </div>
+              <div class="mock-pane mock-inspector">
+                <span class="mock-pane-title" data-i18n="mock.inspector">Inspector</span>
+                <span class="mock-field"></span>
+                <span class="mock-field"></span>
+                <span class="mock-field short"></span>
+                <span class="mock-swatches"><i></i><i></i><i></i><i></i></span>
+              </div>
+            </div>
+            <div class="mock-foot">
+              <span class="mock-live"></span>
+              <span data-i18n="mock.live">Player connesso</span>
+              <span class="mock-sep"></span>
+              <span>1920 × 1080</span>
+              <span class="mock-sep"></span>
+              <span>60%</span>
+            </div>
+          </div>
+
+          <div class="float-card float-a">
+            <svg class="icon"><use href="#i-cast"></use></svg>
+            <div><strong>2</strong><span data-i18n="mock.screens">schermi collegati</span></div>
+          </div>
+          <div class="float-card float-b">
+            <svg class="icon"><use href="#i-qr"></use></svg>
+            <div><strong>QR</strong><span data-i18n="mock.qr">collega uno schermo</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="notice reveal">
+          <svg class="icon"><use href="#i-info"></use></svg>
+          <p data-i18n-html="notice.retired"><strong>La demo web non c'è più.</strong> DoubleScreener v2 è un'applicazione locale: la regia gira sul tuo computer e il browser serve solo come secondo schermo.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="progetto">
+      <div class="container">
+        <div class="section-head reveal">
+          <p class="eyebrow" data-i18n="about.eyebrow">Il progetto</p>
+          <h2 data-i18n="about.title">Una regia, nessun cloud.</h2>
+          <p class="section-lead" data-i18n="about.lead">DoubleScreener nasce per proiettare contenuti su un secondo schermo senza passare da servizi online. Tutto ciò che serve — progetti, immagini, pagine PDF — resta sul computer che apre la presentazione.</p>
+        </div>
+
+        <div class="cards-3">
+          <article class="card reveal">
+            <span class="icon-box"><svg class="icon"><use href="#i-shield"></use></svg></span>
+            <h3 data-i18n="about.c1.title">Locale per scelta</h3>
+            <p data-i18n="about.c1.text">Niente database, login o sincronizzazione remota: i progetti sono file JSON sul disco e il server ascolta solo sulla rete locale.</p>
+          </article>
+          <article class="card reveal">
+            <span class="icon-box"><svg class="icon"><use href="#i-layout"></use></svg></span>
+            <h3 data-i18n="about.c2.title">Un solo renderer</h3>
+            <p data-i18n="about.c2.text">Canvas, player ed export condividono lo stesso codice di rendering: quello che vedi in regia è esattamente ciò che arriva sullo schermo.</p>
+          </article>
+          <article class="card reveal">
+            <span class="icon-box"><svg class="icon"><use href="#i-github"></use></svg></span>
+            <h3 data-i18n="about.c3.title">Aperto e tradotto</h3>
+            <p data-i18n="about.c3.text">Codice GPL-3.0, documentazione tecnica inclusa e interfaccia in italiano e inglese. Nessun componente proprietario.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="funzioni">
+      <div class="container">
+        <div class="section-head reveal">
+          <p class="eyebrow" data-i18n="features.eyebrow">Funzionalità</p>
+          <h2 data-i18n="features.title">Tutto quello che serve per proiettare.</h2>
+          <p class="section-lead" data-i18n="features.lead">Editor, PDF, secondo schermo ed export in un'unica applicazione.</p>
+        </div>
+
+        <div class="features-grid">
+          <article class="feature reveal">
+            <span class="icon-box"><svg class="icon"><use href="#i-monitor"></use></svg></span>
+            <h3 data-i18n="f1.title">Regia desktop nativa</h3>
+            <p data-i18n="f1.text">Costruita con PyQt6: pannelli progetti e slide, ispettore, palette e canvas HTML5. Niente schede del browser da tenere aperte.</p>
+          </article>
+          <article class="feature reveal">
+            <span class="icon-box"><svg class="icon"><use href="#i-file"></use></svg></span>
+            <h3 data-i18n="f2.title">Slide HTML e PDF</h3>
+            <p data-i18n="f2.text">Crea slide da zero o importa pagine da un PDF a intervalli. Le pagine vengono renderizzate lato server in immagini leggere, pronte per il player.</p>
+          </article>
+          <article class="feature reveal">
+            <span class="icon-box"><svg class="icon"><use href="#i-move"></use></svg></span>
+            <h3 data-i18n="f3.title">Editing visuale</h3>
+            <p data-i18n="f3.text">Trascina, ridimensiona e ruota gli elementi con snap e guide. Zoom 25–200%, testo modificabile inline, annulla/ripristina e salvataggio automatico.</p>
+          </article>
+          <article class="feature reveal">
+            <span class="icon-box"><svg class="icon"><use href="#i-sliders"></use></svg></span>
+            <h3 data-i18n="f4.title">Inspector completo</h3>
+            <p data-i18n="f4.text">Geometria, rotazione, opacità e livello; tipografia, colori e allineamento; sfondo, bordo, raggio, ombra e animazioni d'ingresso.</p>
+          </article>
+          <article class="feature reveal">
+            <span class="icon-box"><svg class="icon"><use href="#i-layout"></use></svg></span>
+            <h3 data-i18n="f5.title">Template e temi</h3>
+            <p data-i18n="f5.text">Cinque layout pronti — titolo, sottotitolo, elenco, immagine a tutto schermo, due colonne — e quattro temi colore applicabili al progetto.</p>
+          </article>
+          <article class="feature reveal">
+            <span class="icon-box"><svg class="icon"><use href="#i-cast"></use></svg></span>
+            <h3 data-i18n="f6.title">Second screen, zero app</h3>
+            <p data-i18n="f6.text">TV, tablet o un altro PC aprono il player nel browser. Un QR code li collega; ogni schermo mostra la stessa slide, e con un tasto va in nero.</p>
+          </article>
+          <article class="feature reveal">
+            <span class="icon-box"><svg class="icon"><use href="#i-download"></use></svg></span>
+            <h3 data-i18n="f7.title">Export autonomo</h3>
+            <p data-i18n="f7.text">Esporta il deck come cartella statica o come singolo file HTML con asset inclusi: si apre da file:// anche su un computer senza DoubleScreener.</p>
+          </article>
+          <article class="feature reveal">
+            <span class="icon-box"><svg class="icon"><use href="#i-globe"></use></svg></span>
+            <h3 data-i18n="f8.title">Il tuo spazio locale</h3>
+            <p data-i18n="f8.text">Progetti in JSON, asset in una cartella dedicata, nessun tracciamento. Interfaccia e player disponibili in italiano e inglese.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="come">
+      <div class="container">
+        <div class="section-head reveal">
+          <p class="eyebrow" data-i18n="how.eyebrow">Come funziona</p>
+          <h2 data-i18n="how.title">Tre pezzi, una sola presentazione.</h2>
+          <p class="section-lead" data-i18n="how.lead">La regia è l'unica fonte di verità. Tutto il resto si limita a mostrare la slide corrente.</p>
+        </div>
+
+        <div class="flow reveal">
+          <article class="flow-node">
+            <span class="icon-box"><svg class="icon"><use href="#i-monitor"></use></svg></span>
+            <h3 data-i18n="flow.regia.title">Regia</h3>
+            <p data-i18n="flow.regia.text">Editor PyQt6 con canvas, inspector e anteprima.</p>
+            <span class="flow-tag">PyQt6</span>
+          </article>
+          <div class="flow-arrow" aria-hidden="true"></div>
+          <article class="flow-node">
+            <span class="icon-box"><svg class="icon"><use href="#i-server"></use></svg></span>
+            <h3 data-i18n="flow.server.title">Server locale</h3>
+            <p data-i18n="flow.server.text">FastAPI + Uvicorn sincronizza lo stato via WebSocket.</p>
+            <span class="flow-tag">FastAPI · WebSocket</span>
+          </article>
+          <div class="flow-arrow" aria-hidden="true"></div>
+          <article class="flow-node">
+            <span class="icon-box"><svg class="icon"><use href="#i-cast"></use></svg></span>
+            <h3 data-i18n="flow.screen.title">Second screen</h3>
+            <p data-i18n="flow.screen.text">Qualsiasi browser sulla rete locale, anche una Smart TV.</p>
+            <span class="flow-tag">HTML · CSS · JS</span>
+          </article>
+        </div>
+
+        <div class="steps">
+          <article class="step reveal">
+            <span class="step-num">1</span>
+            <h3 data-i18n="step1.title">Avvia la regia</h3>
+            <p data-i18n="step1.text">Apri DoubleScreener sul computer collegato al proiettore o alla TV.</p>
+          </article>
+          <article class="step reveal">
+            <span class="step-num">2</span>
+            <h3 data-i18n="step2.title">Collega lo schermo</h3>
+            <p data-i18n="step2.text">Inquadra il QR dal pannello Presentazione, oppure apri l'indirizzo LAN nel browser.</p>
+          </article>
+          <article class="step reveal">
+            <span class="step-num">3</span>
+            <h3 data-i18n="step3.title">Presenta</h3>
+            <p data-i18n="step3.text">Crea le slide, premi F5 e naviga con le frecce. Gli schermi restano allineati.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="installa">
+      <div class="container">
+        <div class="section-head reveal">
+          <p class="eyebrow" data-i18n="install.eyebrow">Installa</p>
+          <h2 data-i18n="install.title">Da sorgente, in pochi minuti.</h2>
+          <p class="section-lead" data-i18n="install.lead">DoubleScreener v2 è in sviluppo attivo: per ora si installa da sorgente. Servono Python 3.11+ e Git.</p>
+        </div>
+
+        <div class="install-grid">
+          <div class="requirements reveal">
+            <h3 data-i18n="install.req.title">Requisiti</h3>
+            <ul class="check-list">
+              <li><svg class="icon"><use href="#i-check"></use></svg><span data-i18n-html="install.req1"><strong>Python 3.11+</strong> — testato su Python 3.13.</span></li>
+              <li><svg class="icon"><use href="#i-check"></use></svg><span data-i18n-html="install.req2"><strong>Windows, Linux o macOS</strong> — su Linux servono le librerie Qt/WebEngine della distribuzione.</span></li>
+              <li><svg class="icon"><use href="#i-check"></use></svg><span data-i18n-html="install.req3"><strong>Nessun Node.js</strong> — il frontend è già incluso nel pacchetto.</span></li>
+            </ul>
+            <p class="small-note" data-i18n-html="install.note">Il comando qui sotto usa il branch di sviluppo <code>v2-rewrite</code>. Quando la v2 sarà unita a <code>main</code>, il passaggio del branch non servirà più.</p>
+          </div>
+
+          <div class="code-card reveal">
+            <div class="code-head">
+              <span class="code-dots"><i></i><i></i><i></i></span>
+              <span class="code-title">Terminal</span>
+              <button class="copy-button" id="copyInstall" type="button">
+                <svg class="icon"><use href="#i-copy"></use></svg>
+                <span data-i18n="install.copy">Copia</span>
+              </button>
+            </div>
+            <pre><code id="installCode">git clone https://github.com/il-mangia/doublescreener.github.io.git
+cd doublescreener.github.io
+git switch v2-rewrite
+
+python -m venv .venv
+
+# Windows
+.\.venv\Scripts\Activate.ps1
+
+# Linux / macOS
+source .venv/bin/activate
+
+pip install -e ".[gui]"
+python -m doublescreener</code></pre>
+          </div>
+        </div>
+
+        <div class="callout reveal">
+          <svg class="icon"><use href="#i-zap"></use></svg>
+          <div>
+            <h3 data-i18n="install.after.title">Poi…</h3>
+            <p data-i18n-html="install.after.text">Con la regia aperta, il pannello Presentazione mostra l'indirizzo per il secondo schermo (ad esempio <code>http://192.168.1.20:8765/p</code>) e il QR code. I dati vengono salvati nella cartella utente dell'app; usa <code>--data-dir</code> per sceglierne un'altra.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="stato">
+      <div class="container">
+        <div class="section-head reveal">
+          <p class="eyebrow" data-i18n="status.eyebrow">Stato</p>
+          <h2 data-i18n="status.title">Dove siamo.</h2>
+          <p class="section-lead" data-i18n="status.lead">La v2 è utilizzabile da sorgente. Manca il packaging: non ci sono ancora installer o release scaricabili.</p>
+        </div>
+
+        <div class="status-grid">
+          <article class="panel reveal">
+            <h3><svg class="icon"><use href="#i-check"></use></svg><span data-i18n="status.done.title">Disponibile ora</span></h3>
+            <ul class="check-list">
+              <li><svg class="icon"><use href="#i-check"></use></svg><span data-i18n="status.done1">Editor visuale con inspector, palette, template e temi</span></li>
+              <li><svg class="icon"><use href="#i-check"></use></svg><span data-i18n="status.done2">Slide HTML e import PDF con intervalli di pagine</span></li>
+              <li><svg class="icon"><use href="#i-check"></use></svg><span data-i18n="status.done3">Second screen live con QR, sincronizzazione e schermo nero</span></li>
+              <li><svg class="icon"><use href="#i-check"></use></svg><span data-i18n="status.done4">Export in cartella o file singolo e import progetto JSON</span></li>
+              <li><svg class="icon"><use href="#i-check"></use></svg><span data-i18n="status.done5">Interfaccia IT/EN, tema scuro e chiaro, diagnostica</span></li>
+              <li><svg class="icon"><use href="#i-check"></use></svg><span data-i18n="status.done6">Documentazione: architettura, API, protocollo WebSocket, setup</span></li>
+            </ul>
+          </article>
+
+          <article class="panel reveal">
+            <h3><svg class="icon"><use href="#i-arrow"></use></svg><span data-i18n="status.next.title">In programma</span></h3>
+            <ul class="check-list next">
+              <li><svg class="icon"><use href="#i-arrow"></use></svg><span data-i18n="status.next1">Packaging Windows: installer e versione portable</span></li>
+              <li><svg class="icon"><use href="#i-arrow"></use></svg><span data-i18n="status.next2">Modalità video, camera e pagine web</span></li>
+              <li><svg class="icon"><use href="#i-arrow"></use></svg><span data-i18n="status.next3">Note relatore, multi-view e export PDF del deck</span></li>
+              <li><svg class="icon"><use href="#i-arrow"></use></svg><span data-i18n="status.next4">QA su Windows, browser e Smart TV, poi tag v2.0.0</span></li>
+            </ul>
+          </article>
+        </div>
+
+        <p class="status-note reveal" data-i18n-html="status.note">Il piano di lavoro, le decisioni tecniche e i limiti noti sono nel <a href="https://github.com/il-mangia/doublescreener.github.io/blob/v2-rewrite/work.md" target="_blank" rel="noopener">work.md</a> del repository.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <img class="logo logo-dark" src="logo.png" alt="DoubleScreener" width="160" height="43">
+        <img class="logo logo-light" src="logo-light.png" alt="DoubleScreener" width="160" height="43">
+        <p data-i18n="footer.tagline">Regia desktop e second screen per presentazioni HTML e PDF. Locale, open source, senza cloud.</p>
+      </div>
+
+      <nav class="footer-col" aria-label="Progetto">
+        <h4 data-i18n="footer.project">Progetto</h4>
+        <a href="https://github.com/il-mangia/doublescreener.github.io" target="_blank" rel="noopener" data-i18n="footer.github">Repository GitHub</a>
+        <a href="https://github.com/il-mangia/doublescreener.github.io/issues" target="_blank" rel="noopener" data-i18n="footer.issues">Segnala un problema</a>
+        <a href="https://github.com/il-mangia/doublescreener.github.io/blob/v2-rewrite/README.md" target="_blank" rel="noopener" data-i18n="footer.readme">README</a>
+        <a href="LICENSE" target="_blank" data-i18n="footer.license">Licenza GPL-3.0</a>
+      </nav>
+
+      <nav class="footer-col" aria-label="Documentazione">
+        <h4 data-i18n="footer.docs">Documentazione</h4>
+        <a href="https://github.com/il-mangia/doublescreener.github.io/blob/v2-rewrite/docs/setup.md" target="_blank" rel="noopener" data-i18n="footer.docs.setup">Setup e sviluppo</a>
+        <a href="https://github.com/il-mangia/doublescreener.github.io/blob/v2-rewrite/docs/architecture.md" target="_blank" rel="noopener" data-i18n="footer.docs.architecture">Architettura</a>
+        <a href="https://github.com/il-mangia/doublescreener.github.io/blob/v2-rewrite/docs/api.md" target="_blank" rel="noopener" data-i18n="footer.docs.api">API REST</a>
+        <a href="https://github.com/il-mangia/doublescreener.github.io/blob/v2-rewrite/docs/ws-protocol.md" target="_blank" rel="noopener" data-i18n="footer.docs.ws">Protocollo WebSocket</a>
+      </nav>
+
+      <div class="footer-col">
+        <h4 data-i18n="footer.tech">Costruito con</h4>
+        <div class="tech-chips">
+          <span>Python</span>
+          <span>PyQt6</span>
+          <span>FastAPI</span>
+          <span>WebSocket</span>
+          <span>HTML</span>
+          <span>CSS</span>
+          <span>JavaScript</span>
+        </div>
+      </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
-    <script>
-    // Enhanced JavaScript with animations and interactions
-    function openFrontend() {
-        window.open(
-            'app/frontend.html',
-            'DoubleScreenerPopup',
-            'width=900,height=600,resizable=yes,scrollbars=yes,top=100,left=100'
-        );
-        
-        // Show notification
-        showNotification('Frontend opened in new window!');
-    }
-
-    function openBoth() {
-        // Open frontend immediately
-        openFrontend();
-        
-        // Then go to backend
-        setTimeout(() => {
-            window.location.href = 'app/backend.html';
-        }, 300);
-    }
-    
-    function showNotification(message) {
-        const notification = document.createElement('div');
-        notification.className = 'notification';
-        notification.innerHTML = `
-            <i class="fas fa-check-circle"></i>
-            <span>${message}</span>
-        `;
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.classList.add('show');
-        }, 10);
-        
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                document.body.removeChild(notification);
-            }, 300);
-        }, 3000);
-    }
-    
-    function closeModal() {
-        document.getElementById('feedbackModal').style.display = 'none';
-    }
-    
-    function showAbout() {
-        alert('DoubleScreener v1.0\n\nA dual-screen projection tool for presentations, teaching, and events.\n\nCreated by il-mangia\nOpen Source project');
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        // Enhanced button animations
-        const buttons = document.querySelectorAll('.btn');
-        buttons.forEach(button => {
-            button.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-5px) scale(1.02)';
-                this.style.boxShadow = '0 15px 30px rgba(0, 0, 0, 0.4)';
-            });
-            
-            button.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0) scale(1)';
-                this.style.boxShadow = '';
-            });
-            
-            button.addEventListener('mousedown', function() {
-                this.style.transform = 'translateY(1px) scale(0.98)';
-            });
-            
-            button.addEventListener('mouseup', function() {
-                this.style.transform = 'translateY(-5px) scale(1.02)';
-            });
-        });
-        
-        // Demo preview animation
-        const previewSlide = document.querySelector('.preview-slide');
-        const backendTextarea = document.querySelector('.preview-textarea .textarea-content');
-        const frontendTitle = document.querySelector('.slide-title');
-        const frontendText = document.querySelector('.slide-text');
-        
-        if (previewSlide && backendTextarea && frontendTitle && frontendText) {
-            const demos = [
-                {
-                    backend: "Welcome to DoubleScreener! This is a live preview of how your content will appear on the second screen.",
-                    frontendTitle: "Welcome to DoubleScreener!",
-                    frontendText: "This is a live preview of how your content will appear on the second screen. Changes made on the backend appear here instantly.",
-                    color: "#1b9af7"
-                },
-                {
-                    backend: "Perfect for presentations! Control slides, images, and text in real-time without interruptions.",
-                    frontendTitle: "Perfect for Presentations",
-                    frontendText: "Control slides, images, and text in real-time without interruptions. Keep your audience engaged.",
-                    color: "#6c63ff"
-                },
-                {
-                    backend: "Tombola! DoubleScreener can help you manage Bingo sessions with dual screen display.",
-                    frontendTitle: "Tombola & Gaming Sessions",
-                    frontendText: "DoubleScreener can help you manage Bingo sessions with dual screen display. Perfect for events!",
-                    color: "#2dd4bf"
-                },
-                {
-                    backend: "Classroom ready! Teachers can use DoubleScreener to display content while controlling from their desk.",
-                    frontendTitle: "Classroom Teaching",
-                    frontendText: "Teachers can use DoubleScreener to display content while controlling from their desk. Engage students effectively.",
-                    color: "#f59e0b"
-                }
-            ];
-            
-            let currentDemo = 0;
-            const demoInterval = setInterval(() => {
-                currentDemo = (currentDemo + 1) % demos.length;
-                const demo = demos[currentDemo];
-                
-                // Animate backend change
-                backendTextarea.style.opacity = '0.5';
-                setTimeout(() => {
-                    backendTextarea.textContent = demo.backend;
-                    backendTextarea.style.opacity = '1';
-                }, 300);
-                
-                // Animate frontend change
-                previewSlide.style.opacity = '0.7';
-                setTimeout(() => {
-                    frontendTitle.textContent = demo.frontendTitle;
-                    frontendText.textContent = demo.frontendText;
-                    previewSlide.style.opacity = '1';
-                    
-                    // Update progress bar
-                    const progressBars = document.querySelectorAll('.progress-bar');
-                    progressBars.forEach(bar => {
-                        bar.style.width = `${(currentDemo + 1) * 25}%`;
-                        bar.style.backgroundColor = demo.color;
-                    });
-                    
-                    // Update active indicator
-                    const indicators = document.querySelectorAll('.indicator-dot');
-                    indicators.forEach((dot, index) => {
-                        dot.classList.toggle('active', index === currentDemo);
-                    });
-                    
-                    // Update slide number
-                    const slideNumber = document.querySelector('.slide-number');
-                    if (slideNumber) {
-                        slideNumber.textContent = `Slide ${currentDemo + 1}`;
-                    }
-                    
-                    // Update color picker active state
-                    const colorOptions = document.querySelectorAll('.color-option');
-                    colorOptions.forEach((option, index) => {
-                        if (index === currentDemo % colorOptions.length) {
-                            option.classList.add('active');
-                        } else {
-                            option.classList.remove('active');
-                        }
-                    });
-                    
-                    // Animate sync status
-                    const syncIcon = document.querySelector('.status-syncing');
-                    if (syncIcon) {
-                        syncIcon.style.transform = 'rotate(360deg)';
-                        syncIcon.style.transition = 'transform 0.5s ease';
-                        setTimeout(() => {
-                            syncIcon.style.transform = 'rotate(0deg)';
-                        }, 500);
-                    }
-                }, 300);
-            }, 4000);
-        }
-        
-        // Animated counter for stats
-        const statNumbers = document.querySelectorAll('.stat-number');
-        statNumbers.forEach(stat => {
-            const target = parseInt(stat.getAttribute('data-count'));
-            const duration = 2000;
-            const increment = target / (duration / 16);
-            let current = 0;
-            
-            const updateCounter = () => {
-                if (current < target) {
-                    current += increment;
-                    if (current > target) current = target;
-                    stat.textContent = Math.floor(current);
-                    setTimeout(updateCounter, 16);
-                }
-            };
-            
-            // Start counter when in view
-            const observer = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting) {
-                    updateCounter();
-                    observer.unobserve(stat);
-                }
-            }, { threshold: 0.5 });
-            
-            observer.observe(stat);
-        });
-        
-        // Demo navigation
-        document.getElementById('demoNext')?.addEventListener('click', () => {
-            // Trigger next demo
-            const event = new Event('demoNext');
-            document.dispatchEvent(event);
-        });
-        
-        document.getElementById('demoPrev')?.addEventListener('click', () => {
-            // Trigger previous demo
-            const event = new Event('demoPrev');
-            document.dispatchEvent(event);
-        });
-        
-        // Scroll animations
-        gsap.registerPlugin(ScrollTrigger);
-        
-        document.querySelectorAll('.animate-on-scroll').forEach(element => {
-            gsap.from(element, {
-                scrollTrigger: {
-                    trigger: element,
-                    start: "top 80%",
-                    end: "bottom 20%",
-                    toggleActions: "play none none reverse"
-                },
-                y: 50,
-                opacity: 0,
-                duration: 1,
-                ease: "power2.out"
-            });
-        });
-        const logoPulse = document.querySelector('.logo-pulse');
-        if (logoPulse) {
-            setInterval(() => {
-                logoPulse.style.transform = 'scale(1.5)';
-                logoPulse.style.opacity = '0';
-                
-                setTimeout(() => {
-                    logoPulse.style.transform = 'scale(1)';
-                    logoPulse.style.opacity = '0.3';
-                }, 1000);
-            }, 3000);
-        }
-        const circles = document.querySelectorAll('.bg-circle');
-        circles.forEach((circle, index) => {
-            gsap.to(circle, {
-                x: Math.random() * 100 - 50,
-                y: Math.random() * 100 - 50,
-                duration: 20 + index * 5,
-                repeat: -1,
-                yoyo: true,
-                ease: "sine.inOut"
-            });
-        });
-    });
-    window.onclick = function(event) {
-        const modal = document.getElementById('feedbackModal');
-        if (event.target == modal) {
-            closeModal();
-        }
-    };
-    </script>
+    <div class="container footer-bottom">
+      <p data-i18n-html="footer.legal">Software libero distribuito con licenza <strong>GPL-3.0-only</strong>.</p>
+      <p data-i18n="footer.credits">Copyright © 2026 il-mangia e contributori di DoubleScreener.</p>
+      <p data-i18n="footer.privacy">Nessun cookie, nessun tracciamento: questa pagina è statica.</p>
+    </div>
+  </footer>
 </body>
 </html>

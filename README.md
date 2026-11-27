@@ -2,58 +2,60 @@
   <img src="logo.png" alt="DoubleScreener Logo" height="150">
 </p>
 
-**DoubleScreener** is a **HTML visual editor** designed to create web pages with a **live second-screen**.  
-For more info or for the program documentation, see the [Wiki Page](https://github.com/il-mangia/doublescreener.github.io/wiki).
+**DoubleScreener** is an open-source **desktop control room** for presentations with a **second screen in the browser**.
 
-## Usage
-You can use DoubleScreener [**online**](https://il-mangia.github.io/doublescreener.github.io/) <br>
-But you can also use DoubleScreener local by:
-1. Clone the repository or download the ZIP:  
-   ```bash
-   git clone https://github.com/il-mangia/doublescreener.github.io.git
-2. Open back-end.html in your browser.
-4. Drag elements into the canvas, style them, and press Apply Changes.
-5. Open front-end.html to see the live result!
+The v2 app is a PyQt6 desktop application with an embedded FastAPI server: build HTML slides, import pages from a PDF, and project them to a TV, tablet or another PC over the local network. No cloud, no account, no database.
 
-### DoubleScreener v2 (in sviluppo)
+> The old web demo has been retired. DoubleScreener now runs locally on your computer; the browser is only used for the second screen.
 
-La v2 è una regia desktop **PyQt6** con backend Python (FastAPI + Uvicorn) e second screen web. Il codice vive in `src/doublescreener/` sul branch `v2-rewrite`; la demo statica qui sopra resta disponibile su GitHub Pages.
+## Quick start
+
+Requirements: **Python 3.11+** and Git. On Linux, install the Qt/WebEngine libraries provided by your distribution.
 
 ```bash
-python -m venv .venv
-# Windows: .venv\Scripts\activate
-# Linux/macOS: source .venv/bin/activate
-pip install -e ".[gui,dev]"
+git clone https://github.com/il-mangia/doublescreener.github.io.git
+cd doublescreener.github.io
+git switch v2-rewrite        # development branch of the v2 rewrite
 
-python -m doublescreener              # regia desktop
-python -m doublescreener --headless   # solo backend, senza GUI
+python -m venv .venv
+# Windows
+.\.venv\Scripts\Activate.ps1
+# Linux / macOS
+source .venv/bin/activate
+
+pip install -e ".[gui]"
+python -m doublescreener
 ```
 
-Con la regia aperta, punta TV, tablet o secondo PC all'indirizzo LAN mostrato nel pannello Presentazione (o inquadra il QR). I dati stanno nella cartella utente dell'app; usa `--data-dir PATH` per cambiarli.
+The control room opens with the embedded server. The **Presentation** panel shows the LAN address and a QR code for the second screen (for example `http://192.168.1.20:8765/p`). Projects are stored as JSON in the app's user folder; use `--data-dir PATH` to choose another location.
 
----
+```bash
+python -m doublescreener --headless   # API + player only, no desktop GUI
+```
 
 ## Features
 
-- Drag & drop elements: **Text**, **Button**, **Image**, **Container/Box**  
-- Edit content and style **visually**  
-- Apply simple **animations** (fade, slide, zoom, bounce)  
-- Live preview on a **front-end screen**  
-- Works **locally** in your browser, no server needed  
-- Easy to use for students, teachers, or hobbyists  
+- **Visual editor** — drag, resize, rotate, snapping guides, zoom, inline text editing, undo/redo and autosave.
+- **Inspector** — geometry, typography, colors, box styles, content and entrance animations.
+- **Templates and themes** — five slide layouts, four color themes, system fonts.
+- **HTML and PDF decks** — import PDF pages by range; pages are rendered server-side as lightweight images.
+- **Second screen** — any browser on the LAN, live WebSocket sync, QR connection and black screen.
+- **Standalone export** — a static folder or a single HTML file that opens from `file://`.
+- **Local-first** — JSON projects on disk, no database, no login, no tracking.
+- **Italian and English** interface, dark and light themes.
 
-### File Structure
-/app <br>
-├── back-end.html      <br>
-├── back-end.css       <br>
-├── front-end.html     <br>
-├── front-end.css      <br>
+## Documentation
 
-### Contributing
-Feel free to submit issues or pull requests.
-Suggestions for new features, animations, or usability improvements are very welcome!
+- [Setup and development](docs/setup.md)
+- [Architecture](docs/architecture.md)
+- [REST API](docs/api.md)
+- [WebSocket protocol](docs/ws-protocol.md)
 
-### License
+## Contributing
+
+Feel free to submit issues or pull requests. Suggestions for new features, animations, or usability improvements are very welcome!
+
+## License
 
 DoubleScreener is free software, released under the **GNU General Public License v3.0** (GPL-3.0-only).
 You can use, study, modify and redistribute it under the terms of that license.
