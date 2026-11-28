@@ -58,6 +58,7 @@ def run_gui(
     port: int = DEFAULT_PORT,
     *,
     debug: bool = False,
+    mode: str = "custom",
 ) -> int:
     app = QApplication(sys.argv)
     app.setApplicationName("DoubleScreener")
@@ -71,7 +72,81 @@ def run_gui(
     effective_port = port
     if port == DEFAULT_PORT and settings.port != DEFAULT_PORT:
         effective_port = settings.port
-    effective_host = host
+    # Resolve effective host/port, falling back to a free port if the default is already in use
+    import socket
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as test_sock:
+            test_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            test_sock.bind((effective_host, effective_port))
+    except OSError:
+        # Port already in use – let the OS pick a free one
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as test_sock:
+            test_sock.bind((effective_host, 0))
+            effective_port = test_sock.getsockname()[1]
+    log.info(f"Using server port {effective_port}")
+    if host == DEFAULT_BIND and settings.bind != DEFAULT_BIND:
+        effective_host = settings.bind
+
+    name = _server_name(paths)
+    local_server = QLocalServer()
+    if not local_server.listen(name):
+        if _notify_existing(name):
+            log.info("istanza già attiva: portata in primo piano")
+            return 0
+        local_server.removeServer(name)
+        if not local_server.listen(name):
+            QMessageBox.critical(
+                None,
+                "DoubleScreener",
+                f"Impossibile creare il canale locale: {local_server.errorString()}",
+            )
+            return 1
+
+    runtime = ServerRuntime(paths, host=effective_host, port=effective_port)
+    try:
+        runtime.start()
+    except Exception as exc:
+        log.exception("avvio del server fallito")
+        QMessageBox.critical(
+            None,
+            "DoubleScreener",
+            f"Impossibile avviare il server su {effective_host}:{effective_port}\n\n{exc}",
+        )
+        return 1
+
+    log.info("DoubleScreener %s — regia su %s", __version__, runtime.url)
+    # Pass mode to MainWindow
+    window = MainWindow(paths, runtime, settings_manager, settings, mode=mode)
+    window.local_server = local_server  # type: ignore[attr-defined]
+    local_server.newConnection.connect(lambda: _accept_connections(local_server, window))
+    app.aboutToQuit.connect(runtime.stop)
+    window.show()
+    return app.exec()
+
+    app = QApplication(sys.argv)
+    app.setApplicationName("DoubleScreener")
+    app.setApplicationDisplayName("DoubleScreener")
+    app.setOrganizationName("il-mangia")
+    app.setOrganizationDomain("doublescreener.github.io")
+    app.setStyle("Fusion")
+    settings_manager = SettingsManager(paths)
+    settings = settings_manager.load()
+    app.setStyleSheet(stylesheet_for(settings.theme))
+    effective_port = port
+    if port == DEFAULT_PORT and settings.port != DEFAULT_PORT:
+        effective_port = settings.port
+    # Resolve effective host/port, falling back to a free port if the default is already in use
+    import socket
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as test_sock:
+            test_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            test_sock.bind((effective_host, effective_port))
+    except OSError:
+        # Port already in use – let the OS pick a free one
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as test_sock:
+            test_sock.bind((effective_host, 0))
+            effective_port = test_sock.getsockname()[1]
+    log.info(f"Using server port {effective_port}")
     if host == DEFAULT_BIND and settings.bind != DEFAULT_BIND:
         effective_host = settings.bind
 

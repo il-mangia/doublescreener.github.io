@@ -49,14 +49,14 @@ dev = [
 ]
 
 [project.scripts]
-doublescreener = "doublescreener.__main__:main"
+doublescreener = "app.__main__:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/doublescreener"]
+packages = ["app"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = ["."]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 addopts = "-q"
@@ -64,10 +64,10 @@ addopts = "-q"
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-src = ["src", "tests"]
+src = ["app", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["doublescreener"]
+known-first-party = ["app"]
